@@ -1,0 +1,19 @@
+---
+title: "LDA final project"
+author: "Kaitlin Maciejewski, Morgan de Ferrante, Bingnan Li, Volha Tryputsen"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r load data}
+# save data in separate folder "final_data" one directory up
+data <- read.csv("../final_data/frmgham2.csv") 
+
+library(psych)
+knitr::kable(describe(data)[,c(2,3,4,5,8,9,10,13)])
+```
+
+
