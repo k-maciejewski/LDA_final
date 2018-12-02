@@ -1,0 +1,169 @@
+---
+title: "Kaitlin's EDA"
+author: "Kaitlin Maciejewski"
+date: "12/1/2018"
+output: pdf_document
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = F, message = F)
+```
+
+# Exploratory
+
+```{r load data}
+# save data in separate folder "final_data" one directory up
+library(dplyr)
+data <- read.csv("../final_data/frmgham2.csv") %>% janitor::clean_names()
+attach(data)
+
+library(psych) 
+knitr::kable(describe(data)[,c(2,3,4,5,8,9,10,13)], digits = 3)
+```
+
+```{r}
+# spaghetti
+# lorellogram
+# 
+
+library(ggplot2)
+
+ggplot(data= data, aes(age, cigpday)) + 
+  geom_point(alpha = .6) +
+  geom_smooth(method = 'lm', col = 'red') + 
+  geom_smooth(method = 'loess') +
+  ggtitle("cigpday vs Age Scatterplot")
+
+ggplot(data=data, aes(age, cigpday, group = randid)) + 
+  geom_path(alpha = .6) +
+  geom_smooth(aes(group = NULL), method = 'lm', col = 'red') + 
+  geom_smooth(aes(group = NULL), method = 'loess') +
+  ggtitle("cigpday vs Age Spaghetti Plot")
+
+###
+
+# data.residual <- data %>% na.omit()  %>% 
+# group_by(age) %>%
+# mutate(mean.cigpday = mean(cigpday)) %>%
+# ungroup() %>%
+# mutate(residuals = cigpday - mean.cigpday) %>%
+# group_by(randid) %>%
+# mutate(median.residual = median(residuals)) %>%
+# ungroup() 
+# 
+# data.stats <- c(min(data.residual$median.residual),
+# quantile(data.residual$median.residual,
+# c(.25, .5, .75)), max(data.residual$median.residual))
+# 
+# data.id.select <- data.residual %>%
+# filter(median.residual %in% data.stats) 
+# 
+# data.residual.plot <- ggplot() +
+# geom_line(data = data.id.select,
+# aes(x = age, y = cigpday, group = randid)) +
+# ggtitle("cigpday by time, Selected from Residuals") +
+# geom_smooth(data = data,
+# aes(x = age, y = cigpday))
+
+###
+
+ggplot(data, aes(y = cursmoke, x = age)) + geom_jitter(height = 0.1) +
+stat_summary(fun.y = 'mean', geom="line", col = 'red')
+
+select(data, -c(randid, time,timeap:timehyp)) %>% GGally::ggcorr(.)
+
+
+corr <- data[,c(-1,-21)] %>% cor(., use = "complete.obs")
+library(corrplot)
+corrplot(corr, type = "upper", order = "hclust", 
+         tl.col = "black", tl.srt = 75, tl.offset = 1, tl.cex = .8, method = "ellipse")
+
+corr2 <- data[,c(2,3,4,5,6,7,8,10,11,12,13,14)] %>% cor(., use = "complete.obs")
+corrplot(corr2, type = "upper", order = "hclust", 
+         tl.col = "black", tl.srt = 45)
+
+
+ggplot(data = data,
+aes(x = as.factor(cursmoke), y = age)) +
+geom_violin() +
+  facet_wrap(~sex)
+
+ggplot(data = data,
+aes(x = cigpday, y = age)) +
+geom_point() +
+  facet_wrap(~sex) +
+  geom_smooth()
+
+```
+
+# Models
+
+(1) Is there a relationship between age and smoking status? Does this relationship differ by sex?
+```{r}
+gee::gee(cursmoke~age, id =randid, family=binomial, corstr = "unstructured", na.action = "na.omit")
+
+gee::gee(cursmoke~age+sex, id =randid, family=binomial, corstr = "unstructured", na.action = "na.omit")
+```
+
+
+(2) Is there a relationship between the number of cigarettes smoked per day and age? Does this relationship differ by sex?
+```{r}
+
+```
+
+(1) The relationship between current smoking status and systolic blood pressure. 
+```{r}
+gee::gee(cursmoke~sysbp, id =randid, family=binomial, corstr = "unstructured", na.action = "na.omit")
+```
+
+(2) The relationship between current smoking status and diastolic blood pressure. 
+```{r}
+gee::gee(cursmoke~diabp, id =randid, family=binomial, corstr = "unstructured", na.action = "na.omit")
+```
+
+(3) The relationship between current smoking status and serum total cholesterol.
+```{r}
+gee::gee(cursmoke~totchol, id =randid, family=binomial, corstr = "unstructured", na.action = "na.omit")
+```
+
+#####
+
+What to Turn In: For this assignment you will turn in a single pdf document with (a) your summary of findings and (b) an Appendix with figures and (c) an Appendix with all R code (in the form of a knited pdf).
+
+#OBJECTIVE: 
+An objective or description of the goals of the analysis 
+
+We are interested to describe the smoking habits of the participants in the Framingham Heart study as they age and the impact of smoking on certain health outcomes. The Framingham heart study asks participants about their smoking habits at each visit. In particular, participants are asked if they are currently smoking at this visit (0 = Not a current smoker, 1 = Current smoker), which we will refer to as current smoking status. In addition, participants also report the number of cigarettes they are smoking per day. A more complete description of each of variables in the Framingham Heart study can be found in the Framingham Heart Study Longitudinal Data Documentation. 
+
+We are interested to answer the following questions:
+
+(1) Is there a relationship between age and smoking status? Does this relationship differ by sex?
+
+(2) Is there a relationship between the number of cigarettes smoked per day and age? Does this relationship differ by sex?
+
+While answering these questions, please account for any confounders that you have evidence may impact the relationship between age and sex with smoking.
+
+Next you are interested in the relationship between certain health outcomes and smoking status. In particular you are interested in :
+
+(1) The relationship between current smoking status and systolic blood pressure. 
+
+(2) The relationship between current smoking status and diastolic blood pressure. 
+
+(3) The relationship between current smoking status and serum total cholesterol.
+
+Again, while answering these questions, please account for any confounders that you have evidence may impact these relationships.
+
+#STUDY DESIGN: 
+A brief description of the study design and the data
+
+#METHODS: 
+A methods section describing your statistical analysis (please justify all modeling choices that were made with evidence).
+
+#RESULTS: 
+A results section that includes a) descriptive statistics for the data b) a summary of your key findings including supporting numerical summaries (i.e. confidence intervals, pvalues, etc.) c) interpretations of your key findings (i.e. interpretations of coefficients).
+
+#CONCLUSION: 
+A conclusion specifically answering the objective of the analysis.
+
+#APPENDIX:
