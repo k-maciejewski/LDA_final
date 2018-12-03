@@ -35,11 +35,17 @@ ggplot(data= data, aes(age, cigpday)) +
   geom_smooth(method = 'loess') +
   ggtitle("cigpday vs Age Scatterplot")
 
-ggplot(data=data, aes(age, cigpday, group = randid)) + 
+ggplot(data=data, aes(age, cigpday, group = randid, color = as.factor(sex))) + 
   geom_path(alpha = .6) +
   geom_smooth(aes(group = NULL), method = 'lm', col = 'red') + 
   geom_smooth(aes(group = NULL), method = 'loess') +
   ggtitle("cigpday vs Age Spaghetti Plot")
+
+ggplot(data=data, aes(as.factor(period), cigpday, group = randid, color = as.factor(sex))) + 
+  geom_path(alpha = .6) +
+  geom_smooth(aes(group = NULL), method = 'lm', col = 'red') + 
+  geom_smooth(aes(group = NULL), method = 'loess') +
+  ggtitle("cigpday vs time Spaghetti Plot")
 
 ###
 
@@ -101,30 +107,52 @@ geom_point() +
 
 (1) Is there a relationship between age and smoking status? Does this relationship differ by sex?
 ```{r}
-gee::gee(cursmoke~age, id =randid, family=binomial, corstr = "unstructured", na.action = "na.omit")
+smoke_stat_age <- gee::gee(cursmoke~age, id =randid, family=binomial, corstr = "unstructured", na.action = "na.omit")
 
-gee::gee(cursmoke~age+sex, id =randid, family=binomial, corstr = "unstructured", na.action = "na.omit")
+knitr::kable(summary(smoke_stat_age)$coefficients[,c(1,4,5)],digits = 3)
+
+smoke_stat_sex <- gee::gee(cursmoke~age+as.factor(sex), id =randid, family=binomial, corstr = "unstructured", na.action = "na.omit")
+
+knitr::kable(summary(smoke_stat_sex)$coefficients[,c(1,4,5)],digits = 3)
+
+knitr::kable(round(2*pnorm(abs(coef(summary(smoke_stat_sex))[,5]), lower.tail = FALSE), 3))
 ```
 
 
 (2) Is there a relationship between the number of cigarettes smoked per day and age? Does this relationship differ by sex?
 ```{r}
+cigpday_age <- gee::gee(cigpday~age, id=randid, family=poisson, corstr = "unstructured", na.action = "na.omit")
 
+knitr::kable(summary(cigpday_age)$coefficients[,c(1,4,5)],digits = 3)
+
+ncig_gee <- gee::gee(cigpday~age+as.factor(sex), id=randid, family=poisson, corstr = "unstructured", na.action = "na.omit")
+
+summary(ncig_gee)
+
+knitr::kable(summary(ncig_gee)$coefficients[,c(1,4,5)],digits = 3)
+
+knitr::kable(round(2*pnorm(abs(coef(summary(ncig_gee))[,5]), lower.tail = FALSE),3))
 ```
 
 (1) The relationship between current smoking status and systolic blood pressure. 
 ```{r}
-gee::gee(cursmoke~sysbp, id =randid, family=binomial, corstr = "unstructured", na.action = "na.omit")
+smoke_sys<-gee::gee(cursmoke~sysbp, id =randid, family=binomial, corstr = "unstructured", na.action = "na.omit") 
+
+knitr::kable(summary(smoke_sys)$coefficients[,c(1,4,5)],digits = 3)
 ```
 
 (2) The relationship between current smoking status and diastolic blood pressure. 
 ```{r}
-gee::gee(cursmoke~diabp, id =randid, family=binomial, corstr = "unstructured", na.action = "na.omit")
+smoke_dias<-gee::gee(cursmoke~diabp, id =randid, family=binomial, corstr = "unstructured", na.action = "na.omit")
+
+knitr::kable(summary(smoke_dias)$coefficients[,c(1,4,5)],digits = 3)
 ```
 
 (3) The relationship between current smoking status and serum total cholesterol.
 ```{r}
-gee::gee(cursmoke~totchol, id =randid, family=binomial, corstr = "unstructured", na.action = "na.omit")
+smoke_chol<-gee::gee(cursmoke~totchol, id =randid, family=binomial, corstr = "unstructured", na.action = "na.omit")
+
+knitr::kable(summary(smoke_chol)$coefficients[,c(1,4,5)],digits = 3)
 ```
 
 #####
