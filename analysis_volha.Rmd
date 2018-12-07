@@ -3,10 +3,14 @@ title: "Final Project"
 author: "Volha Tryputsen"
 date: "12/01/2018"
 output:
-  pdf_document: 
-   toc: true
-   toc_depth: 6
-   highlight: tango
+  html_document:
+    df_print: paged
+    toc: yes
+    toc_depth: '6'
+  pdf_document:
+    highlight: tango
+    toc: yes
+    toc_depth: 6
 editor_options:
   chunk_output_type: console
 ---
@@ -38,16 +42,18 @@ dat =
 ```
 
 
-```{r preprocessing}
+```{r eval = FALSE}
 dim(dat)
-
 
 glimpse(dat)
 head(dat)
 View(dat)
 
 dat %>% select(sex) %>% head()
+```
 
+
+```{r preprocessing}
 dat = 
   dat %>%
   mutate(sex = factor(sex)) #%>% fct_recode(sex, "female" =  "2", "male" = "1")
