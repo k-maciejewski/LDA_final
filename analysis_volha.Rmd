@@ -1,0 +1,285 @@
+---
+title: "Final Project"
+author: "Volha Tryputsen"
+date: "12/01/2018"
+output:
+  pdf_document: 
+   toc: true
+   toc_depth: 6
+   highlight: tango
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, fig.height = 6, fig.width = 7)
+```
+
+
+```{r libraries}
+library(tidyverse)
+library(janitor)
+library(knitr)
+library(gee)
+library(MuMIn)
+library(forcats)
+library(knitr)
+
+
+
+library(RLRsim) # for testing significance of random intercept
+```
+
+
+```{r data}
+dat = 
+  read.csv(file = '../frmgham2.csv') %>%
+  clean_names()
+```
+
+
+```{r preprocessing}
+dim(dat)
+
+
+glimpse(dat)
+head(dat)
+View(dat)
+
+dat %>% select(sex) %>% head()
+
+dat = 
+  dat %>%
+  mutate(sex = factor(sex)) #%>% fct_recode(sex, "female" =  "2", "male" = "1")
+```
+
+
+# Smoking vs. Age, Sex
+## (1): Smoking ~ age, sex  
+### Is there a relationship between age and smoking status? 
+ANS: Yes, the proportion of smokers decreases with the age.  
+
+```{r}
+dat %>%
+  select(cursmoke, age) %>% 
+  ggplot(aes(x = age, y = cursmoke)) +
+  geom_jitter(height = 0.1, alpha = 0.1) +
+  geom_smooth(lwd = 1.5) +
+  theme_bw() 
+```
+
+
+### Does this relationship differ by sex?  
+ANS: There is a higher proportion of smoker among men compared to women as both age ,but there is no interaction between age and sex.      
+```{r}
+dat %>%
+  select(cursmoke, age, sex) %>% 
+  ggplot(aes(x = age, y = cursmoke, group = sex, color = sex)) +
+  geom_jitter(height = 0.1, alpha = 0.1) +
+  geom_smooth(lwd = 1.5) +
+  theme_bw() 
+```
+
+
+## (2) number of sigarets  ~ age, sex 
+### Is there a relationship between the number of cigarettes smoked per day and age?   
+ANS: Yes, number of sigarets smoked per day stays constant for 30-50 years old and decreases with age after 50 years old.   
+
+#### All 
+
+```{r}
+dat %>%
+  select(cigpday, age) %>% 
+  ggplot(aes(x = age, y = cigpday)) +
+  geom_jitter(height = 0.1, alpha = 0.1) +
+  geom_smooth(lwd = 1.5) +
+  theme_bw() 
+```
+
+
+#### Smokers only  
+
+```{r}
+dat %>%
+  select(cigpday, age) %>% 
+  filter(cigpday > 0) %>%
+  ggplot(aes(x = age, y = cigpday)) +
+  geom_jitter(height = 0.1, alpha = 0.1) +
+  geom_smooth(lwd = 1.5) +
+  theme_bw() 
+```
+
+
+
+### Does this relationship differ by sex?  
+ANS: There is sex effect (men smoke higer number of sigarets per day than women across age), but there is no sex and age interaction.  
+
+#### All  
+```{r}
+dat %>%
+  select(cigpday, age, sex) %>% 
+  ggplot(aes(x = age, y = cigpday, group = sex, color = sex)) +
+  geom_jitter(height = 0.1, alpha = 0.1) +
+  geom_smooth(lwd = 1.5) +
+  theme_bw() 
+```
+
+#### Smokers only    
+```{r}
+dat %>%
+  select(cigpday, age, sex) %>% 
+  filter(cigpday > 0) %>% 
+  ggplot(aes(x = age, y = cigpday, group = sex, color = sex)) +
+  geom_jitter(height = 0.1, alpha = 0.1) +
+  geom_smooth(lwd = 1.5) +
+  theme_bw() 
+```
+
+
+
+# Smoking vs. health outcomes  
+
+## (1) The relationship between current smoking status and systolic blood pressure.  
+### smoking ~ sysbp  
+ANS: Proportion of smokers decreases with increase of systolic blood presure  
+```{r}
+dat %>%
+  select(cursmoke, sysbp) %>% 
+  ggplot(aes(x = sysbp, y = cursmoke)) +
+  geom_jitter(height = 0.1, alpha = 0.1) +
+  geom_smooth(lwd = 1.5) +
+  theme_bw() 
+```
+
+ANS: slightly higher sysbp for non-smokers  
+```{r}
+dat %>%
+  select(cursmoke, sysbp) %>% 
+  mutate(cursmoke = factor(cursmoke)) %>%
+  ggplot(aes(y = sysbp, x = cursmoke)) +
+  geom_boxplot(outlier.colour = "white") +
+  geom_jitter(width = 0.1, alpha = 0.1) +
+  theme_bw() 
+```
+
+### smoking ~ sysbp, sex  
+ANS: Proportion of smokers decreases with increase of systolic blood presure; the proportion is higher for men (sex effect).     
+```{r}
+dat %>%
+  select(cursmoke, sysbp, sex) %>% 
+  ggplot(aes(x = sysbp, y = cursmoke, group = sex, color = sex)) +
+  geom_jitter(height = 0.1, alpha = 0.1) +
+  geom_smooth(lwd = 1.5) +
+  theme_bw() 
+```
+
+ANS: no differences in sysbp between male and female smokers and non-smokers  
+```{r}
+dat %>%
+  select(cursmoke, sex, sysbp) %>% 
+  mutate(cursmoke = factor(cursmoke),
+           smoke_sex = interaction(cursmoke, sex)) %>% 
+  ggplot(aes(y = sysbp, x = smoke_sex)) +
+  geom_boxplot(outlier.colour = "white") +
+  geom_jitter(width = 0.1, alpha = 0.1) +
+  theme_bw() 
+```
+
+
+## (2) The relationship between current smoking status and diastolic blood pressure.  
+
+### smoking ~ diabp  
+ANS: Proportion of smokers decreases with increase of diastolic blood presure for BP=100 ad then proportion increases again (latter could be due to not enough data)  
+```{r}
+dat %>%
+  select(cursmoke, diabp) %>% 
+  ggplot(aes(x = diabp, y = cursmoke)) +
+  geom_jitter(height = 0.1, alpha = 0.1) +
+  geom_smooth(lwd = 1.5) +
+  theme_bw() 
+```
+
+ANS: no difference    
+```{r}
+dat %>%
+  select(cursmoke, diabp) %>% 
+  mutate(cursmoke = factor(cursmoke)) %>%
+  ggplot(aes(y = diabp, x = cursmoke)) +
+  geom_boxplot(outlier.colour = "white") +
+  geom_jitter(width = 0.1, alpha = 0.1) +
+  theme_bw() 
+```
+
+### smoking ~ diabp, sex  
+ANS: Proportion of smokers decreases with increase of diastolic blood presure; the proprtions are higher for men (sex effect).     
+```{r}
+dat %>%
+  select(cursmoke, diabp, sex) %>% 
+  ggplot(aes(x = diabp, y = cursmoke, group = sex, color = sex)) +
+  geom_jitter(height = 0.1, alpha = 0.1) +
+  geom_smooth(lwd = 1.5) +
+  theme_bw() 
+```
+
+ANS: no difference  
+```{r}
+dat %>%
+  select(cursmoke, sex, diabp) %>% 
+  mutate(cursmoke = factor(cursmoke),
+           smoke_sex = interaction(cursmoke, sex)) %>% 
+  ggplot(aes(y = diabp, x = smoke_sex)) +
+  geom_boxplot(outlier.colour = "white") +
+  geom_jitter(width = 0.1, alpha = 0.1) +
+  theme_bw() 
+```
+
+
+## (3) The relationship between current smoking status and serum total cholesterol.  
+### smoking ~ totchol   
+ANS: Proportion of smokers slightly decreases with increase of total cholesterol values   
+```{r}
+dat %>%
+  select(cursmoke, totchol) %>% 
+  ggplot(aes(x = totchol, y = cursmoke)) +
+  geom_jitter(height = 0.1, alpha = 0.1) +
+  geom_smooth(lwd = 1.5) +
+  theme_bw() 
+```
+
+ANS: no difference    
+```{r}
+dat %>%
+  select(cursmoke, totchol) %>% 
+  mutate(cursmoke = factor(cursmoke)) %>%
+  ggplot(aes(y = totchol, x = cursmoke)) +
+  geom_boxplot(outlier.colour = "white") +
+  geom_jitter(width = 0.1, alpha = 0.1) +
+  theme_bw() 
+```
+
+
+### smoking ~ totchol, sex [!!!]  
+ANS: Proportion of smokers hasnonlinera relationship with total cholesterol for women; proprtions increases with increase in total cholesterol for men (sex by totchol interaction effect).     
+```{r}
+dat %>%
+  select(cursmoke, totchol, sex) %>% 
+  ggplot(aes(x = totchol, y = cursmoke, group = sex, color = sex)) +
+  geom_jitter(height = 0.1, alpha = 0.1) +
+  geom_smooth(lwd = 1.5) +
+  theme_bw() 
+```
+
+ANS: no difference  
+```{r}
+dat %>%
+  select(cursmoke, sex, totchol) %>% 
+  mutate(cursmoke = factor(cursmoke),
+           smoke_sex = interaction(cursmoke, sex)) %>% 
+  ggplot(aes(y = totchol, x = smoke_sex)) +
+  geom_boxplot(outlier.colour = "white") +
+  geom_jitter(width = 0.1, alpha = 0.1) +
+  theme_bw() 
+```
+
+
+
