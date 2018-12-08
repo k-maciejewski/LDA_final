@@ -81,7 +81,7 @@ glm_sys <- glm(cursmoke ~ diabp +
                  heartrte + glucose + educ + prevchd + prevap + prevmi +
                  prevstrk + prevhyp + time + hdlc + factor(period) + death + 
                  angina + mi_fchd + anychd + stroke + cvd + hyperten, 
-               family = "binomial", data = data, na.action = na.omit)
+                 family = "binomial", data = data, na.action = na.omit)
 summary(glm_sys)
 
 glm_sys <- glm(cursmoke ~ totchol + 
@@ -89,5 +89,57 @@ glm_sys <- glm(cursmoke ~ totchol +
                  heartrte + glucose + educ + prevchd + prevap + prevmi +
                  prevstrk + prevhyp + time + hdlc + factor(period) + death + 
                  angina + mi_fchd + anychd + stroke + cvd + hyperten, 
-               family = "binomial", data = data, na.action = na.omit)
+                family = "binomial", data = data, na.action = na.omit)
 summary(glm_sys)
+
+
+
+library(mice)
+data_to_impute
+
+tempData <- mice(data,m=5,maxit=50,meth='pmm',seed=500)
+
+# TO INCLUDE 
+
+# age - we want to see how smoking status changes as we get older
+# sex - exploratory data analysis showed there were differences
+# education - found in the literature 
+# total cholesterol
+# BMI - confounder based on literature 
+# diabetes (https://www.cdc.gov/tobacco/data_statistics/sgr/50th-anniversary/pdfs/fs_smoking_diabetes_508.pdf)
+# heart rate -  smoking increases heart rate (in literature)
+# prevchd since prevmi and prevap are correlaed 
+# prevstroke
+# prevhyp
+# timedth
+
+DONT INCLUDE
+systolic, diastolic bc we have hypertension
+BPmeds  - not significant 
+LDL and HDL have too many NAs
+glucose - correlated with diabetes
+
+
+library(dplyr)
+data %>%
+group_by(randid) %>%
+  summarise(sum_death = sum(death)) %>%
+  filter(sum_death > 0 )
+
+library(lme4)
+
+final_data <- data %>%
+  select(cursmoke, age, sex, educ,totchol,bmi,diabetes,heartrte,prevchd, prevstrk, prevhyp, timedth , randid) %>%
+  mutate(sex = factor(sex),
+         educ = factor(educ))
+
+tempData <- mice(data,m=5,maxit=50,meth='pmm',seed=500)
+
+
+fit <- glmer(cursmoke ~ age + factor(sex) + factor(educ)  + bmi + 
+             diabetes + heartrte + prevchd + prevstrk + prevhyp + timedth + (1 | randid),
+             family = binomial, 
+             na.action = "na.omit") 
+
+
+      
