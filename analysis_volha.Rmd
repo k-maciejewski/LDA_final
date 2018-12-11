@@ -288,4 +288,90 @@ dat %>%
 ```
 
 
+# EDA for correlation  
+```{r}
+lorelogram <- function(id, time, y, title, plot_n){
+  data <- data_frame(id,time,y)
+  #function that innumerates all combinations of a given time
+  #and all futures times for an individual and then
+  #returns a dataframe of time differences and results at both time points
+  calc_time_deltas <- function(ind_data){
+    results <- expand.grid(ind_data$time,ind_data$time) %>%
+      rename(time1 = Var1, time2 = Var2) %>% #rename columns to meaningful stuff
+      right_join(ind_data[,c("time", "y")], by = c("time1" = "time")) %>%
+      rename(y1 = y) %>% #add results for time1 from the full data
+      right_join(ind_data[,c("time", "y")], by = c("time2" = "time")) %>%
+      rename(y2 = y) %>% #add results for time2 from the full data.
+      mutate(time_diff = time1 - time2, id = ind_data$id[1]) %>% #find difference in times
+      filter(time_diff > 0) #cleanup output.
+    }
+  Z <- data %>%
+    group_by(id) %>% #grab an individuals data in isolation
+    do(calc_time_deltas(.)) #run the immumeration function
+  #Predict past outcomes from future by utilizing time differences
+  outcome_model <- glm(y1 ~ y2:factor(time_diff), data=Z, family=binomial)
+  #grab the parameter estimates (ignoring intercept)
+  LOR_estimates <- data_frame(
+    time_diff = sort(unique(Z$time_diff)),
+    point_est = summary(outcome_model)$coef[-1,1],
+    std_err = summary(outcome_model)$coef[-1,2] ) %>%
+    mutate(lower_bound = point_est - 1.96*std_err,
+           upper_bound = point_est + 1.96*std_err)
+  #plot it
+  ggplot(LOR_estimates, aes(x = time_diff)) +
+    geom_ribbon(aes(ymin = lower_bound, ymax = upper_bound, fill = "95 % CI"),
+                alpha = 0.5) +
+    geom_line(aes(y = point_est, color = "point estimate")) +
+    scale_colour_manual("",values="black")+
+    scale_fill_manual("",values="steelblue") +
+    labs(x = "time change", y = "Log Odds Ratio", title = title,
+    caption = paste("Figure", plot_n, sep = " "))
+  }
 
+
+lorelogram(id = dat$randid,
+           time = dat$age,
+           y = dat$cursmoke,
+           title = 'Lorelogram',
+           plot_n = 12)
+
+apply(dat,2,function(x)100*sum(is.na(x))/11627)
+dim(dat)
+
+plot(dat$sysbp, dat$diabp); cor(dat$sysbp, dat$diabp)
+plot(dat$sysbp, dat$totchol); cor(dat$sysbp, dat$totchol, use = "complete.obs")
+
+
+dat_na = na.omit(dat)
+hclust(dat_na[,-c(1,7)])
+
+head(datt)
+
+
+chisq.test(table(dat$stroke[dat$period == 1], dat$cursmoke[dat$period == 1]))
+
+chisq.test(table(dat$death, dat$cursmoke))
+
+chisq.test(table(dat$death, dat$cursmoke))
+
+table(dat$death)
+
+m1 = lme4::glmer(cursmoke ~ age + sex + as.factor(educ) + (1|randid), family = binomial, data = dat)
+m2 = lme4::glmer(cursmoke ~ age + sex + as.factor(educ) + bmi + (1|randid), family = binomial, data = dat)
+
+m1 = lme4::glmer(cursmoke ~ age + sex + as.factor(educ) + (1|randid), family = binomial, data = dat)
+
+AIC(m1, m2)
+summary(m1)
+
+
+# remove  hdlc, ldlc 
+datt = dat[,-c(22,23)]
+
+
+
+
+
+pairs()
+
+```
