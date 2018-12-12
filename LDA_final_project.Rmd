@@ -15,29 +15,25 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, message = FALSE, out.width = "70%")
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, out.width = "70%", cache = T)
 library(tidyverse)
 library(janitor)
 library(knitr)
 library(MuMIn)
 library(forcats)
 library(RLRsim)
-```
-
-# Exploratory
-
-```{r load data}
 data <- read.csv("../final_data/frmgham2.csv") %>% clean_names()
 attach(data)
 ```
 
+# Exploratory
 
-# Smoking vs. Age, Sex
+## Smoking vs. Age, Sex
 ## (1): Smoking ~ age, sex  
 ### Is there a relationship between age and smoking status? 
 ANS: Yes, the proportion of smokers decreases with the age.  
 
-```{r}
+```{r, smoke_v_age}
 data %>%
   select(cursmoke, age) %>% 
   ggplot(aes(x = age, y = cursmoke)) +
@@ -49,7 +45,7 @@ data %>%
 
 ### Does this relationship differ by sex?  
 ANS: There is a higher proportion of smoker among men compared to women as both age ,but there is no interaction between age and sex.      
-```{r}
+```{r, smoke_age_sex}
 data %>%
   select(cursmoke, age, sex) %>% 
   ggplot(aes(x = age, y = cursmoke, group = sex, color = sex)) +
@@ -59,13 +55,13 @@ data %>%
 ```
 
 
-## (2) number of cigarets  ~ age, sex 
+## (2) number of cigarettes  ~ age, sex 
 ### Is there a relationship between the number of cigarettes smoked per day and age?   
 ANS: Yes, number of sigarets smoked per day stays constant for 30-50 years old and decreases with age after 50 years old.   
 
 #### All 
 
-```{r}
+```{r, n_c_age_all}
 data %>%
   select(cigpday, age) %>% 
   ggplot(aes(x = age, y = cigpday)) +
@@ -77,7 +73,7 @@ data %>%
 
 #### Smokers only  
 
-```{r}
+```{r, n_c_age_smoke}
 data %>%
   select(cigpday, age) %>% 
   filter(cigpday > 0) %>%
@@ -93,7 +89,7 @@ data %>%
 ANS: There is sex effect (men smoke higer number of sigarets per day than women across age), but there is no sex and age interaction.  
 
 #### All  
-```{r}
+```{r, n_c_age_s_all}
 data %>%
   select(cigpday, age, sex) %>% 
   ggplot(aes(x = age, y = cigpday, group = sex, color = sex)) +
@@ -103,7 +99,7 @@ data %>%
 ```
 
 #### Smokers only    
-```{r}
+```{r, n_c_age_s_smoke}
 data %>%
   select(cigpday, age, sex) %>% 
   filter(cigpday > 0) %>% 
@@ -115,12 +111,12 @@ data %>%
 
 
 
-# Smoking vs. health outcomes  
+## Smoking vs. health outcomes  
 
 ## (1) The relationship between current smoking status and systolic blood pressure.  
 ### smoking ~ sysbp  
 ANS: Proportion of smokers decreases with increase of systolic blood presure  
-```{r}
+```{r, smoke_sbp}
 data %>%
   select(cursmoke, sysbp) %>% 
   ggplot(aes(x = sysbp, y = cursmoke)) +
@@ -130,7 +126,7 @@ data %>%
 ```
 
 ANS: slightly higher sysbp for non-smokers  
-```{r}
+```{r, smoke_sysbp_status}
 data %>%
   select(cursmoke, sysbp) %>% 
   mutate(cursmoke = factor(cursmoke)) %>%
@@ -141,7 +137,7 @@ data %>%
 
 ### smoking ~ sysbp, sex  
 ANS: Proportion of smokers decreases with increase of systolic blood presure; the proportion is higher for men (sex effect).     
-```{r}
+```{r, smoke_sysbp_sex}
 data %>%
   select(cursmoke, sysbp, sex) %>% 
   ggplot(aes(x = sysbp, y = cursmoke, group = sex, color = sex)) +
@@ -151,7 +147,7 @@ data %>%
 ```
 
 ANS: no differences in sysbp between male and female smokers and non-smokers  
-```{r}
+```{r, smoke_sysbp_sex_status}
 data %>%
   select(cursmoke, sex, sysbp) %>% 
   mutate(cursmoke = factor(cursmoke),
@@ -166,7 +162,7 @@ data %>%
 
 ### smoking ~ diabp  
 ANS: Proportion of smokers decreases with increase of diastolic blood presure for BP=100 ad then proportion increases again (latter could be due to not enough data)  
-```{r}
+```{r, smoke_dbp}
 data %>%
   select(cursmoke, diabp) %>% 
   ggplot(aes(x = diabp, y = cursmoke)) +
@@ -176,7 +172,7 @@ data %>%
 ```
 
 ANS: no difference    
-```{r}
+```{r, smoke_dbp_box}
 data %>%
   select(cursmoke, diabp) %>% 
   mutate(cursmoke = factor(cursmoke)) %>%
@@ -187,7 +183,7 @@ data %>%
 
 ### smoking ~ diabp, sex  
 ANS: Proportion of smokers decreases with increase of diastolic blood presure; the proprtions are higher for men (sex effect).     
-```{r}
+```{r, smoke_dbp_s}
 data %>%
   select(cursmoke, diabp, sex) %>% 
   ggplot(aes(x = diabp, y = cursmoke, group = sex, color = sex)) +
@@ -197,7 +193,7 @@ data %>%
 ```
 
 ANS: no difference  
-```{r}
+```{r, smoke_dbp_s_bp}
 data %>%
   select(cursmoke, sex, diabp) %>% 
   mutate(cursmoke = factor(cursmoke),
@@ -211,7 +207,7 @@ data %>%
 ## (3) The relationship between current smoking status and serum total cholesterol.  
 ### smoking ~ totchol   
 ANS: Proportion of smokers slightly decreases with increase of total cholesterol values   
-```{r}
+```{r, smoke_tc}
 data %>%
   select(cursmoke, totchol) %>% 
   ggplot(aes(x = totchol, y = cursmoke)) +
@@ -221,7 +217,7 @@ data %>%
 ```
 
 ANS: no difference    
-```{r}
+```{r, smoke_tc_bp}
 data %>%
   select(cursmoke, totchol) %>% 
   mutate(cursmoke = factor(cursmoke)) %>%
@@ -233,7 +229,7 @@ data %>%
 
 ### smoking ~ totchol, sex [!!!]  
 ANS: Proportion of smokers hasnonlinera relationship with total cholesterol for women; proprtions increases with increase in total cholesterol for men (sex by totchol interaction effect).     
-```{r}
+```{r, smoke_tc_sex}
 data %>%
   select(cursmoke, totchol, sex) %>% 
   ggplot(aes(x = totchol, y = cursmoke, group = sex, color = sex)) +
@@ -243,7 +239,7 @@ data %>%
 ```
 
 ANS: no difference  
-```{r}
+```{r, smoke_tc_sex_bp}
 data %>%
   select(cursmoke, sex, totchol) %>% 
   mutate(cursmoke = factor(cursmoke),
@@ -253,8 +249,8 @@ data %>%
   theme_bw() 
 ```
 
-# Missingness
-```{r}
+## Missingness
+```{r, missingness}
 library(dplyr)
 prop <- round(colSums(is.na(data))/dim(data)[1], 3)
 
@@ -324,18 +320,13 @@ library(dplyr)
 
 (1) Is there a relationship between age and smoking status? Does this relationship differ by sex?
 ```{r}
-summary(gee::gee(cursmoke ~ age + sex + as.factor(educ) + bmi + diabetes+ heartrte + prevchd + prevstrk + prevhyp + timedth, id = randid, family=binomial))
-
-
-#%>% knitr::kable(summary(.)$coefficients,digits = 3)
+summary(gee::gee(cursmoke ~ age + sex + as.factor(educ) + bmi + diabetes+ heartrte + prevchd + prevstrk + prevhyp + timedth, id = randid, family=binomial, corstr = "unstructured"))
 ```
 
 (2) Is there a relationship between the number of cigarettes smoked per day and age? Does this
 relationship differ by sex?
 ```{r}
-lmer(cigpday ~ age + sex + as.factor(educ) + (1|randid), na.action = "na.omit") 
-
-#%>% knitr::kable(summary(.)$coefficients,digits = 3)
+summary(gee::gee(cigpday ~ age + sex + as.factor(educ),  id = randid, corstr = "unstructured")) 
 ```
 
 While answering these questions, please account for any confounders that you have evidence may impact the relationship between age and sex with smoking.
@@ -344,17 +335,17 @@ Next you are interested in the relationship between certain health outcomes and 
 
 (1) The relationship between current smoking status and systolic blood pressure. 
 ```{r}
-glmer(sysbp ~ cursmoke + age + sex + as.factor(educ) + (1|randid), family=binomial, na.action = "na.omit") %>% knitr::kable(summary(.)$coefficients,digits = 3)
+summary(gee::gee(sysbp ~ cursmoke + age + sex + as.factor(educ), id = randid, na.action = "na.omit", corstr = "unstructured"))
 ```
 
 (2) The relationship between current smoking status and diastolic blood pressure. 
 ```{r}
-glmer(diabp ~ cursmoke + age + sex + as.factor(educ) + (1|randid), family=binomial, na.action = "na.omit") %>% knitr::kable(summary(.)$coefficients,digits = 3)
+summary(gee::gee(diabp ~ cursmoke + age + sex + as.factor(educ), id = randid, na.action = "na.omit", corstr = "unstructured"))
 ```
 
 (3) The relationship between current smoking status and serum total cholesterol.
 ```{r}
-glmer(totchol ~ cursmoke + age + sex + as.factor(educ) + (1|randid), family=binomial, na.action = "na.omit") %>% knitr::kable(summary(.)$coefficients,digits = 3)
+summary(gee::gee(totchol ~ cursmoke + age + sex + as.factor(educ), id = randid, na.action = "na.omit", corstr = "unstructured"))
 ```
 
 ```{r}
@@ -366,6 +357,8 @@ knitr::kable(summary(model_1)$coefficients,digits = 3)
 ```{r, eval = F}
 glmer(cursmoke~ age + sex + totchol + as.factor(educ) + bmi + diabetes+ heartrte + prevchd + prevstrk + prevhyp + timedth + (1|randid), family=binomial, na.action = "na.omit") %>% knitr::kable(summary(.)$coefficients,digits = 3) # too many covariates to converge
 ```
+
+\sectionbreak
 
 #####
 #REPORT
