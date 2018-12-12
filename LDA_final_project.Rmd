@@ -15,7 +15,7 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, message = FALSE)
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, out.width = "70%")
 library(tidyverse)
 library(janitor)
 library(knitr)
@@ -273,7 +273,7 @@ prob.data
 table(data$period)
 ```
 
-```{r, eval = F}
+```{r, eval = F, echo = F}
 ##plot these probabilities 
 ggplot(prob.data, aes(y=sysbp_prob,
                       x=period)) + 
@@ -315,22 +315,60 @@ cdplot(factor(cursmoke) ~ totchol, data=data,
        xlab = "Total Cholesterol")
 ```
 
-# models
+# Models
 
 ```{r}
 library(lme4)
 library(dplyr)
+```
 
-model_1<-glmer(cursmoke~ age + sex + sysbp + diabp+ totchol + as.factor(educ) + (1|randid), family=binomial, na.action = "na.omit")
+(1) Is there a relationship between age and smoking status? Does this relationship differ by sex?
+```{r}
+summary(gee::gee(cursmoke ~ age + sex + as.factor(educ) + bmi + diabetes+ heartrte + prevchd + prevstrk + prevhyp + timedth, id = randid, family=binomial))
+
+
+#%>% knitr::kable(summary(.)$coefficients,digits = 3)
+```
+
+(2) Is there a relationship between the number of cigarettes smoked per day and age? Does this
+relationship differ by sex?
+```{r}
+lmer(cigpday ~ age + sex + as.factor(educ) + (1|randid), na.action = "na.omit") 
+
+#%>% knitr::kable(summary(.)$coefficients,digits = 3)
+```
+
+While answering these questions, please account for any confounders that you have evidence may impact the relationship between age and sex with smoking.
+
+Next you are interested in the relationship between certain health outcomes and smoking status. In particular you are interested in:
+
+(1) The relationship between current smoking status and systolic blood pressure. 
+```{r}
+glmer(sysbp ~ cursmoke + age + sex + as.factor(educ) + (1|randid), family=binomial, na.action = "na.omit") %>% knitr::kable(summary(.)$coefficients,digits = 3)
+```
+
+(2) The relationship between current smoking status and diastolic blood pressure. 
+```{r}
+glmer(diabp ~ cursmoke + age + sex + as.factor(educ) + (1|randid), family=binomial, na.action = "na.omit") %>% knitr::kable(summary(.)$coefficients,digits = 3)
+```
+
+(3) The relationship between current smoking status and serum total cholesterol.
+```{r}
+glmer(totchol ~ cursmoke + age + sex + as.factor(educ) + (1|randid), family=binomial, na.action = "na.omit") %>% knitr::kable(summary(.)$coefficients,digits = 3)
+```
+
+```{r}
+model_1<-glmer(cursmoke~ age + sex + sysbp + diabp + totchol + as.factor(educ) + (1|randid), family=binomial, na.action = "na.omit")
 
 knitr::kable(summary(model_1)$coefficients,digits = 3)
 ```
 
 ```{r, eval = F}
-glmer(cursmoke~ age + sex + totchol + as.factor(educ) + bmi + diabetes+ heartrte + prevchd + prevstrk + prevhyp + timedth + (1|randid), family=binomial, na.action = "na.omit") %>% knitr::kable(summary(.)$coefficients,digits = 3)
+glmer(cursmoke~ age + sex + totchol + as.factor(educ) + bmi + diabetes+ heartrte + prevchd + prevstrk + prevhyp + timedth + (1|randid), family=binomial, na.action = "na.omit") %>% knitr::kable(summary(.)$coefficients,digits = 3) # too many covariates to converge
 ```
 
 #####
+#REPORT
 
 What to Turn In: For this assignment you will turn in a single pdf document with (a) your summary of findings and (b) an Appendix with figures and (c) an Appendix with all R code (in the form of a knited pdf).
 
@@ -357,7 +395,8 @@ A brief description of the study design and the data
 #METHODS: 
 A methods section describing your statistical analysis (please justify all modeling choices that were made with evidence).
 
- TO INCLUDE:
+
+TO INCLUDE:
 
  age - we want to see how smoking status changes as we get older  
  sex - exploratory data analysis showed there were differences  
