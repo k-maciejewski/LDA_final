@@ -358,6 +358,124 @@ knitr::kable(summary(model_1)$coefficients,digits = 3)
 glmer(cursmoke~ age + sex + totchol + as.factor(educ) + bmi + diabetes+ heartrte + prevchd + prevstrk + prevhyp + timedth + (1|randid), family=binomial, na.action = "na.omit") %>% knitr::kable(summary(.)$coefficients,digits = 3) # too many covariates to converge
 ```
 
+# models from bingnan ...
+
+## model of EDA:
+(1) Is there a relationship between age and smoking status? 
+Does this relationship differ by sex?
+```{r}
+my.data <- read.csv("../final_data/frmgham2.csv")
+library(gee)
+
+model.q1 <- gee(CURSMOKE ~ AGE + as.factor(SEX) + as.factor(educ) 
+                 + BMI + DIABETES + HEARTRTE + PREVCHD + PREVSTRK 
+                 + PREVHYP + TIMEDTH, 
+                 id = RANDID,
+                 data = my.data,
+                 family=binomial, 
+                 corstr = "unstructured")
+summary(model.q1)
+```
+(2) Is there a relationship between the number of cigarettes smoked per day and age? 
+Does this relationship differ by sex?
+```{r}
+model.q2 <- lmer(CIGPDAY ~ AGE + as.factor(SEX) + as.factor(educ) + (1|RANDID),
+                  data = my.data)
+summary(model.q2)
+```
+If we think cig per day as count data, it follows poisson distribution.
+Then we can fit GEE model as well:
+```{r}
+model.q2_1 <- gee(CIGPDAY ~ AGE + as.factor(SEX) + as.factor(educ),
+                  data = my.data,
+                  id = RANDID,
+                  family=poisson,
+                  corstr = "unstructured")
+summary(model.q2_1)
+```
+
+## model including age and sex
+(1) The relationship between current smoking status and systolic blood pressure.
+```{r}
+model.p1 <- gee(SYSBP ~ CURSMOKE + AGE + as.factor(SEX) 
+                + as.factor(educ), 
+                id = RANDID, 
+                data = my.data,
+                na.action = "na.omit",
+                corstr = "unstructured")
+summary(model.p1)
+#fit exchangeable model
+model.p1.1 <- gee(SYSBP ~ CURSMOKE + AGE + as.factor(SEX) 
+                + as.factor(educ), 
+                id = RANDID, 
+                data = my.data,
+                na.action = "na.omit",
+                corstr = "exchangeable")
+summary(model.p1.1)
+```
+Compare the naive SE and robust SE we can see that exchangeable model is reasonable.
+
+
+(2) The relationship between current smoking status and diastolic blood pressure. 
+```{r}
+model.p2 <- gee(DIABP ~ CURSMOKE + AGE + as.factor(SEX) 
+                + as.factor(educ), 
+                id = RANDID,
+                data = my.data,
+                na.action = "na.omit", 
+                corstr = "unstructured")
+summary(model.p2)
+#fit exchangeable model
+model.p2.2 <- gee(DIABP ~ CURSMOKE + AGE + as.factor(SEX) 
+                + as.factor(educ), 
+                id = RANDID,
+                data = my.data,
+                na.action = "na.omit", 
+                corstr = "exchangeable")
+summary(model.p2.2)
+```
+(2) The relationship between current smoking status and serum total cholesterol.
+```{r}
+model.p3 <- gee(TOTCHOL ~ CURSMOKE + AGE + as.factor(SEX) 
+                + as.factor(educ),
+                data = my.data,
+                id = RANDID, 
+                na.action = "na.omit", 
+                corstr = "unstructured")
+summary(model.p3)
+#fit exchangeable model
+model.p3.3 <- gee(TOTCHOL ~ CURSMOKE + AGE + as.factor(SEX) 
+                + as.factor(educ),
+                data = my.data,
+                id = RANDID, 
+                na.action = "na.omit", 
+                corstr = "exchangeable")
+summary(model.p3.3)
+```
+
+Using mixed effect model using cig per day instead of smoking status:
+```{r}
+#saturated model
+model.saturated <- lmer(CIGPDAY ~ as.factor(SEX) + AGE 
+                            + BPMEDS + as.factor(educ)
+                            + TOTCHOL + BMI + GLUCOSE + DIABETES + HEARTRTE + PREVAP
+                            + PREVCHD + PREVMI + PREVSTRK +STROKE+ PREVHYP + (1|RANDID),
+                              na.action = 'na.omit',
+                              data = my.data)
+summary(model.saturated)
+```
+
+```{r}
+#using variables that selected
+model.mixed2 <- lmer(CIGPDAY~ AGE + as.factor(SEX) + SYSBP 
+                      + DIABP + TOTCHOL + as.factor(educ) 
+                      + (1|RANDID),
+                      data = my.data,
+                      na.action = "na.omit")
+summary(model.mixed2)
+```
+
+
 \sectionbreak
 
 #####

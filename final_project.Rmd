@@ -19,7 +19,7 @@ library(Amelia)
 library(reshape2)
 
 #import the data
-my.data <- read.csv("F:/courses/longitudinal/FINAL/frmgham2.csv")
+my.data <- read.csv("../final_data/frmgham2.csv")
 head(my.data)
 summary(my.data$AGE)
 ```
@@ -64,8 +64,8 @@ We find that there are some missing data in BPMEDS.
 
 MISSING DATA ANALYSIS
 ```{r}
-aggr(my.data, prop=T, numbers=T)
-md.pattern(my.data)
+VIM::aggr(my.data, prop=T, numbers=T)
+mice::md.pattern(my.data)
 ```
 
 #model of EDA:
