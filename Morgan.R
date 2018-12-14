@@ -6,6 +6,7 @@ attach(data)
 
 library(ggplot2)
 library(dplyr)
+library(gee)
 
 data$sex <- recode(data$sex, `1` = "male", `2` = "female")
 data$cursmoke_char <- recode(data$cursmoke, `1` = "yes", `0` = "no")
@@ -113,11 +114,11 @@ tempData <- mice(data,m=5,maxit=50,meth='pmm',seed=500)
 # prevhyp
 # timedth
 
-DONT INCLUDE
-systolic, diastolic bc we have hypertension
-BPmeds  - not significant 
-LDL and HDL have too many NAs
-glucose - correlated with diabetes
+#DONT INCLUDE
+#systolic, diastolic bc we have hypertension
+#BPmeds  - not significant 
+#LDL and HDL have too many NAs
+#glucose - correlated with diabetes
 
 
 library(dplyr)
@@ -133,13 +134,77 @@ final_data <- data %>%
   mutate(sex = factor(sex),
          educ = factor(educ))
 
-tempData <- mice(data,m=5,maxit=50,meth='pmm',seed=500)
+tempData <- mice(final_data,where = m=5,meth='rf',seed=500)
 
 
 fit <- glmer(cursmoke ~ age + factor(sex) + factor(educ)  + bmi + 
-             diabetes + heartrte + prevchd + prevstrk + prevhyp + timedth + (1 | randid),
+             diabetes + heartrte + prevchd + prevstrk + prevhyp  + (1 | randid),
              family = binomial, 
              na.action = "na.omit") 
 
 
-      
+fit <- gee(cursmoke ~ age + factor(sex) + factor(educ)  + bmi + 
+               diabetes + heartrte + prevchd + prevstrk + prevhyp + timedth,
+           id = randid,
+           family = "binomial",
+           na.action = "na.omit")
+
+##################
+# Initial Models #
+##################
+
+
+totchol_fit <- gee(totchol ~ cursmoke + age + factor(sex) + factor(educ)  + bmi + 
+             diabetes + heartrte + prevchd + prevhyp +  prevstrk + death,
+           id = randid,
+           family = "gaussian",
+           na.action = "na.omit")
+
+round(2 * pnorm(abs(coef(summary(totchol_fit))[,5]), lower.tail = FALSE), 3) 
+
+
+sysbp_fit <- gee(sysbp ~ cursmoke + age + factor(sex) + factor(educ)  + bmi + 
+                     diabetes + heartrte + prevchd + prevstrk + death,
+                   id = randid,
+                   family = "gaussian",
+                   na.action = "na.omit")
+round(2 * pnorm(abs(coef(summary(sysbp_fit))[,5]), lower.tail = FALSE), 3) 
+
+diabp_fit <- gee(diabp ~ cursmoke + age + factor(sex) + factor(educ)  + bmi + 
+                     diabetes + heartrte + prevchd + prevstrk +death,
+                   id = randid,
+                   family = "gaussian",
+                   na.action = "na.omit")
+
+round(2 * pnorm(abs(coef(summary(diabp_fit))[,5]), lower.tail = FALSE), 3) 
+
+
+###############################################
+# Models After Removing Non Significant Terms #
+###############################################
+
+totchol_fit <- gee(totchol ~ cursmoke + age + factor(sex) + bmi + 
+                     diabetes + heartrte  + prevhyp ,
+                   id = randid,
+                   family = "gaussian",
+                   na.action = "na.omit")
+
+round(2 * pnorm(abs(coef(summary(totchol_fit))[,5]), lower.tail = FALSE), 3) 
+
+
+sysbp_fit <- gee(sysbp ~ cursmoke + age + factor(sex)  + bmi + 
+                   diabetes + heartrte + prevchd + prevstrk + death,
+                 id = randid,
+                 family = "gaussian",
+                 na.action = "na.omit")
+round(2 * pnorm(abs(coef(summary(sysbp_fit))[,5]), lower.tail = FALSE), 3) 
+
+diabp_fit <- gee(diabp ~ cursmoke  + factor(sex) + factor(educ)  + bmi + 
+                   diabetes + heartrte  + prevstrk +death,
+                 id = randid,
+                 family = "gaussian",
+                 na.action = "na.omit")
+
+round(2 * pnorm(abs(coef(summary(diabp_fit))[,5]), lower.tail = FALSE), 3) 
+
+
