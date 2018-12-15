@@ -182,6 +182,7 @@ round(2 * pnorm(abs(coef(summary(diabp_fit))[,5]), lower.tail = FALSE), 3)
 ###############################################
 # Models After Removing Non Significant Terms #
 ###############################################
+library(MuMIn)
 
 totchol_fit <- gee(totchol ~ cursmoke + age + factor(sex) + bmi + 
                      diabetes + heartrte  + prevhyp ,
@@ -190,7 +191,7 @@ totchol_fit <- gee(totchol ~ cursmoke + age + factor(sex) + bmi +
                    na.action = "na.omit")
 
 round(2 * pnorm(abs(coef(summary(totchol_fit))[,5]), lower.tail = FALSE), 3) 
-
+QIC(totchol_fit)
 
 sysbp_fit <- gee(sysbp ~ cursmoke + age + factor(sex)  + bmi + 
                    diabetes + heartrte + prevchd + prevstrk + death,
@@ -198,13 +199,15 @@ sysbp_fit <- gee(sysbp ~ cursmoke + age + factor(sex)  + bmi +
                  family = "gaussian",
                  na.action = "na.omit")
 round(2 * pnorm(abs(coef(summary(sysbp_fit))[,5]), lower.tail = FALSE), 3) 
+QIC(sysbp_fit)
 
 diabp_fit <- gee(diabp ~ cursmoke  + factor(sex) + factor(educ)  + bmi + 
                    diabetes + heartrte  + prevstrk +death,
-                 id = randid,
+                 id = randatdid,
                  family = "gaussian",
                  na.action = "na.omit")
 
 round(2 * pnorm(abs(coef(summary(diabp_fit))[,5]), lower.tail = FALSE), 3) 
+QIC(diabp_fit)
 
 
