@@ -15,7 +15,7 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, message = FALSE, out.width = "70%", cache = T)
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, cache = T)
 library(tidyverse)
 library(janitor)
 library(knitr)
@@ -34,7 +34,7 @@ attach(data)
 ANS: Yes, the proportion of smokers decreases with the age.  
 
 ```{r, smoke_v_age}
-data %>%
+smoke_v_age = data %>%
   select(cursmoke, age) %>% 
   ggplot(aes(x = age, y = cursmoke)) +
   geom_jitter(height = 0.1, alpha = 0.1) +
@@ -46,7 +46,7 @@ data %>%
 ### Does this relationship differ by sex?  
 ANS: There is a higher proportion of smoker among men compared to women as both age ,but there is no interaction between age and sex.      
 ```{r, smoke_age_sex}
-data %>%
+smoke_age_sex = data %>%
   select(cursmoke, age, sex) %>% 
   ggplot(aes(x = age, y = cursmoke, group = sex, color = sex)) +
   geom_jitter(height = 0.1, alpha = 0.1) +
@@ -62,7 +62,7 @@ ANS: Yes, number of sigarets smoked per day stays constant for 30-50 years old a
 #### All 
 
 ```{r, n_c_age_all}
-data %>%
+n_c_age_all = data %>%
   select(cigpday, age) %>% 
   ggplot(aes(x = age, y = cigpday)) +
   geom_jitter(height = 0.1, alpha = 0.1) +
@@ -74,7 +74,7 @@ data %>%
 #### Smokers only  
 
 ```{r, n_c_age_smoke}
-data %>%
+n_c_age_smoke = data %>%
   select(cigpday, age) %>% 
   filter(cigpday > 0) %>%
   ggplot(aes(x = age, y = cigpday)) +
@@ -83,14 +83,12 @@ data %>%
   theme_bw() 
 ```
 
-
-
 ### Does this relationship differ by sex?  
 ANS: There is sex effect (men smoke higer number of sigarets per day than women across age), but there is no sex and age interaction.  
 
 #### All  
 ```{r, n_c_age_s_all}
-data %>%
+n_c_age_s_all = data %>%
   select(cigpday, age, sex) %>% 
   ggplot(aes(x = age, y = cigpday, group = sex, color = sex)) +
   geom_jitter(height = 0.1, alpha = 0.1) +
@@ -100,7 +98,7 @@ data %>%
 
 #### Smokers only    
 ```{r, n_c_age_s_smoke}
-data %>%
+n_c_age_s_smoke = data %>%
   select(cigpday, age, sex) %>% 
   filter(cigpday > 0) %>% 
   ggplot(aes(x = age, y = cigpday, group = sex, color = sex)) +
@@ -109,15 +107,13 @@ data %>%
   theme_bw() 
 ```
 
-
-
 ## Smoking vs. health outcomes  
 
 ## (1) The relationship between current smoking status and systolic blood pressure.  
 ### smoking ~ sysbp  
 ANS: Proportion of smokers decreases with increase of systolic blood presure  
 ```{r, smoke_sbp}
-data %>%
+smoke_sbp = data %>%
   select(cursmoke, sysbp) %>% 
   ggplot(aes(x = sysbp, y = cursmoke)) +
   geom_jitter(height = 0.1, alpha = 0.1) +
@@ -127,7 +123,7 @@ data %>%
 
 ANS: slightly higher sysbp for non-smokers  
 ```{r, smoke_sysbp_status}
-data %>%
+smoke_sysbp_status = data %>%
   select(cursmoke, sysbp) %>% 
   mutate(cursmoke = factor(cursmoke)) %>%
   ggplot(aes(y = sysbp, x = cursmoke)) +
@@ -138,7 +134,7 @@ data %>%
 ### smoking ~ sysbp, sex  
 ANS: Proportion of smokers decreases with increase of systolic blood presure; the proportion is higher for men (sex effect).     
 ```{r, smoke_sysbp_sex}
-data %>%
+smoke_sysbp_sex = data %>%
   select(cursmoke, sysbp, sex) %>% 
   ggplot(aes(x = sysbp, y = cursmoke, group = sex, color = sex)) +
   geom_jitter(height = 0.1, alpha = 0.1) +
@@ -148,7 +144,7 @@ data %>%
 
 ANS: no differences in sysbp between male and female smokers and non-smokers  
 ```{r, smoke_sysbp_sex_status}
-data %>%
+smoke_sysbp_sex_status = data %>%
   select(cursmoke, sex, sysbp) %>% 
   mutate(cursmoke = factor(cursmoke),
            smoke_sex = interaction(cursmoke, sex)) %>% 
@@ -163,7 +159,7 @@ data %>%
 ### smoking ~ diabp  
 ANS: Proportion of smokers decreases with increase of diastolic blood presure for BP=100 ad then proportion increases again (latter could be due to not enough data)  
 ```{r, smoke_dbp}
-data %>%
+smoke_dbp = data %>%
   select(cursmoke, diabp) %>% 
   ggplot(aes(x = diabp, y = cursmoke)) +
   geom_jitter(height = 0.1, alpha = 0.1) +
@@ -173,7 +169,7 @@ data %>%
 
 ANS: no difference    
 ```{r, smoke_dbp_box}
-data %>%
+smoke_dbp_box = data %>%
   select(cursmoke, diabp) %>% 
   mutate(cursmoke = factor(cursmoke)) %>%
   ggplot(aes(y = diabp, x = cursmoke)) +
@@ -184,7 +180,7 @@ data %>%
 ### smoking ~ diabp, sex  
 ANS: Proportion of smokers decreases with increase of diastolic blood presure; the proprtions are higher for men (sex effect).     
 ```{r, smoke_dbp_s}
-data %>%
+smoke_dbp_s = data %>%
   select(cursmoke, diabp, sex) %>% 
   ggplot(aes(x = diabp, y = cursmoke, group = sex, color = sex)) +
   geom_jitter(height = 0.1, alpha = 0.1) +
@@ -194,7 +190,7 @@ data %>%
 
 ANS: no difference  
 ```{r, smoke_dbp_s_bp}
-data %>%
+smoke_dbp_s_bp = data %>%
   select(cursmoke, sex, diabp) %>% 
   mutate(cursmoke = factor(cursmoke),
            smoke_sex = interaction(cursmoke, sex)) %>% 
@@ -208,7 +204,7 @@ data %>%
 ### smoking ~ totchol   
 ANS: Proportion of smokers slightly decreases with increase of total cholesterol values   
 ```{r, smoke_tc}
-data %>%
+smoke_tc = data %>%
   select(cursmoke, totchol) %>% 
   ggplot(aes(x = totchol, y = cursmoke)) +
   geom_jitter(height = 0.1, alpha = 0.1) +
@@ -218,7 +214,7 @@ data %>%
 
 ANS: no difference    
 ```{r, smoke_tc_bp}
-data %>%
+smoke_tc_bp = data %>%
   select(cursmoke, totchol) %>% 
   mutate(cursmoke = factor(cursmoke)) %>%
   ggplot(aes(y = totchol, x = cursmoke)) +
@@ -230,7 +226,7 @@ data %>%
 ### smoking ~ totchol, sex [!!!]  
 ANS: Proportion of smokers hasnonlinera relationship with total cholesterol for women; proprtions increases with increase in total cholesterol for men (sex by totchol interaction effect).     
 ```{r, smoke_tc_sex}
-data %>%
+smoke_tc_sex = data %>%
   select(cursmoke, totchol, sex) %>% 
   ggplot(aes(x = totchol, y = cursmoke, group = sex, color = sex)) +
   geom_jitter(height = 0.1, alpha = 0.1) +
@@ -240,7 +236,7 @@ data %>%
 
 ANS: no difference  
 ```{r, smoke_tc_sex_bp}
-data %>%
+smoke_tc_sex_bp = data %>%
   select(cursmoke, sex, totchol) %>% 
   mutate(cursmoke = factor(cursmoke),
            smoke_sex = interaction(cursmoke, sex)) %>% 
@@ -249,17 +245,32 @@ data %>%
   theme_bw() 
 ```
 
+```{r, plot_grid, out.width = "50%", fig.show = "hold"}
+smoke_age_sex
+smoke_sysbp_sex
+smoke_tc_sex
+```
+
+
+## Cor plot
+```{r}
+library(dplyr)
+
+corr <- data[,c(-1,-21)] %>% cor(., use = "complete.obs") 
+
+library(corrplot)
+
+corrplot(corr, type = "upper", order = "hclust",
+         tl.col = "black", tl.srt = 75, 
+         tl.offset = 1, tl.cex= .8, method = "ellipse")
+```
+
+
 ## Missingness
 ```{r, missingness}
-library(dplyr)
 prop <- round(colSums(is.na(data))/dim(data)[1], 3)
 
 knitr::kable(sort(prop, decreasing = TRUE)[1:9], col.names = "Proportion of NAs")
-
-#MISSING DATA ANALYSIS
-VIM::aggr(data, prop=T, numbers=T)
-mice::md.pattern(data)
-# HDLC and LDLC have a lot of missing data, and these variables should be eliminated
 
 prob.data <- data %>%
   group_by(period) %>% 
@@ -269,48 +280,6 @@ prob.data
 table(data$period)
 ```
 
-```{r, eval = F, echo = F}
-##plot these probabilities 
-ggplot(prob.data, aes(y=sysbp_prob,
-                      x=period)) + 
-  geom_line() + 
-  labs(color = 'Avg Systolic BP')
-
-
-prob.data <- data %>%
-  group_by(period) %>% 
-  summarise(diabp_prob = sum(diabp, na.rm = TRUE)/n())
-
-##plot these probabilities 
-ggplot(prob.data, aes(y=diabp_prob,
-                      x=period)) + 
-  geom_line() + 
-  labs(color = 'Avg Diastolic BP')
-
-prob.data <- data %>%
-  group_by(period) %>% 
-  summarise(totchol_prob = sum(totchol, na.rm = TRUE)/n())
-
-##plot these probabilities 
-ggplot(prob.data, aes(y=totchol_prob,
-                      x=period)) + 
-  geom_line() + 
-  labs(color = 'Avg Total Chol BP')
-
-
-cdplot(factor(cursmoke) ~ sysbp, data=data, 
-       ylab = "Current Smoking Status", 
-       xlab = "Systolic BP")
-
-cdplot(factor(cursmoke) ~ diabp, data=data, 
-       ylab = "Current Smoking Status", 
-       xlab = "Diatolic BP")
-
-cdplot(factor(cursmoke) ~ totchol, data=data, 
-       ylab = "Current Smoking Status", 
-       xlab = "Total Cholesterol")
-```
-
 # Models
 
 ```{r}
@@ -318,49 +287,6 @@ library(lme4)
 library(dplyr)
 ```
 
-(1) Is there a relationship between age and smoking status? Does this relationship differ by sex?
-```{r}
-summary(gee::gee(cursmoke ~ age + sex + as.factor(educ) + bmi + diabetes+ heartrte + prevchd + prevstrk + prevhyp + timedth, id = randid, family=binomial, corstr = "unstructured"))
-```
-
-(2) Is there a relationship between the number of cigarettes smoked per day and age? Does this
-relationship differ by sex?
-```{r}
-summary(gee::gee(cigpday ~ age + sex + as.factor(educ),  id = randid, corstr = "unstructured")) 
-```
-
-While answering these questions, please account for any confounders that you have evidence may impact the relationship between age and sex with smoking.
-
-Next you are interested in the relationship between certain health outcomes and smoking status. In particular you are interested in:
-
-(1) The relationship between current smoking status and systolic blood pressure. 
-```{r}
-summary(gee::gee(sysbp ~ cursmoke + age + sex + as.factor(educ), id = randid, na.action = "na.omit", corstr = "unstructured"))
-```
-
-(2) The relationship between current smoking status and diastolic blood pressure. 
-```{r}
-summary(gee::gee(diabp ~ cursmoke + age + sex + as.factor(educ), id = randid, na.action = "na.omit", corstr = "unstructured"))
-```
-
-(3) The relationship between current smoking status and serum total cholesterol.
-```{r}
-summary(gee::gee(totchol ~ cursmoke + age + sex + as.factor(educ), id = randid, na.action = "na.omit", corstr = "unstructured"))
-```
-
-```{r}
-model_1<-glmer(cursmoke~ age + sex + sysbp + diabp + totchol + as.factor(educ) + (1|randid), family=binomial, na.action = "na.omit")
-
-knitr::kable(summary(model_1)$coefficients,digits = 3)
-```
-
-```{r, eval = F}
-glmer(cursmoke~ age + sex + totchol + as.factor(educ) + bmi + diabetes+ heartrte + prevchd + prevstrk + prevhyp + timedth + (1|randid), family=binomial, na.action = "na.omit") %>% knitr::kable(summary(.)$coefficients,digits = 3) # too many covariates to converge
-```
-
-# models from bingnan ...
-
-## model of EDA:
 (1) Is there a relationship between age and smoking status? 
 Does this relationship differ by sex?
 ```{r}
@@ -374,83 +300,30 @@ model.q1 <- gee(CURSMOKE ~ AGE + as.factor(SEX) + as.factor(educ)
                  data = my.data,
                  family=binomial, 
                  corstr = "unstructured")
-summary(model.q1)
+knitr::kable(summary(model.q1)$coefficients[,c(1,4,5)], digits = 3)
+model.q1[["working.correlation"]]
 ```
+
 (2) Is there a relationship between the number of cigarettes smoked per day and age? 
 Does this relationship differ by sex?
 ```{r}
-model.q2 <- lmer(CIGPDAY ~ AGE + as.factor(SEX) + as.factor(educ) + (1|RANDID),
+model.q2 <- lmer(CIGPDAY ~ AGE + as.factor(SEX) + 
+                   as.factor(educ) + (1|RANDID),
                   data = my.data)
-summary(model.q2)
 ```
 If we think cig per day as count data, it follows poisson distribution.
 Then we can fit GEE model as well:
 ```{r}
-model.q2_1 <- gee(CIGPDAY ~ AGE + as.factor(SEX) + as.factor(educ),
+model.q2_1 <- gee(CIGPDAY ~ AGE + as.factor(SEX) + as.factor(educ) 
+                 + BMI + DIABETES + HEARTRTE + PREVCHD + PREVSTRK 
+                 + PREVHYP + TIMEDTH,
                   data = my.data,
                   id = RANDID,
                   family=poisson,
                   corstr = "unstructured")
-summary(model.q2_1)
-```
+knitr::kable(summary(model.q2_1)$coefficients[,c(1,4,5)], digits = 3)
 
-## model including age and sex
-(1) The relationship between current smoking status and systolic blood pressure.
-```{r}
-model.p1 <- gee(SYSBP ~ CURSMOKE + AGE + as.factor(SEX) 
-                + as.factor(educ), 
-                id = RANDID, 
-                data = my.data,
-                na.action = "na.omit",
-                corstr = "unstructured")
-summary(model.p1)
-#fit exchangeable model
-model.p1.1 <- gee(SYSBP ~ CURSMOKE + AGE + as.factor(SEX) 
-                + as.factor(educ), 
-                id = RANDID, 
-                data = my.data,
-                na.action = "na.omit",
-                corstr = "exchangeable")
-summary(model.p1.1)
-```
-Compare the naive SE and robust SE we can see that exchangeable model is reasonable.
-
-
-(2) The relationship between current smoking status and diastolic blood pressure. 
-```{r}
-model.p2 <- gee(DIABP ~ CURSMOKE + AGE + as.factor(SEX) 
-                + as.factor(educ), 
-                id = RANDID,
-                data = my.data,
-                na.action = "na.omit", 
-                corstr = "unstructured")
-summary(model.p2)
-#fit exchangeable model
-model.p2.2 <- gee(DIABP ~ CURSMOKE + AGE + as.factor(SEX) 
-                + as.factor(educ), 
-                id = RANDID,
-                data = my.data,
-                na.action = "na.omit", 
-                corstr = "exchangeable")
-summary(model.p2.2)
-```
-(2) The relationship between current smoking status and serum total cholesterol.
-```{r}
-model.p3 <- gee(TOTCHOL ~ CURSMOKE + AGE + as.factor(SEX) 
-                + as.factor(educ),
-                data = my.data,
-                id = RANDID, 
-                na.action = "na.omit", 
-                corstr = "unstructured")
-summary(model.p3)
-#fit exchangeable model
-model.p3.3 <- gee(TOTCHOL ~ CURSMOKE + AGE + as.factor(SEX) 
-                + as.factor(educ),
-                data = my.data,
-                id = RANDID, 
-                na.action = "na.omit", 
-                corstr = "exchangeable")
-summary(model.p3.3)
+model.q2_1[["working.correlation"]]
 ```
 
 Using mixed effect model using cig per day instead of smoking status:
@@ -475,62 +348,107 @@ model.mixed2 <- lmer(CIGPDAY~ AGE + as.factor(SEX) + SYSBP
 summary(model.mixed2)
 ```
 
+```{r}
+library(dplyr)
 
-\sectionbreak
-
-#####
-#REPORT
-
-What to Turn In: For this assignment you will turn in a single pdf document with (a) your summary of findings and (b) an Appendix with figures and (c) an Appendix with all R code (in the form of a knited pdf).
-
-#OBJECTIVE: 
-An objective or description of the goals of the analysis 
-
-We are interested to describe the smoking habits of the participants in the Framingham Heart study as they age and the impact of smoking on certain health outcomes. The Framingham heart study asks participants about their smoking habits at each visit. In particular, participants are asked if they are currently smoking at this visit (0 = Not a current smoker, 1 = Current smoker), which we will refer to as current smoking status. In addition, participants also report the number of cigarettes they are smoking per day. A more complete description of each of variables in the Framingham Heart study can be found in the Framingham Heart Study Longitudinal Data Documentation. 
-
-We are interested to answer the following questions:
-
-(1) Is there a relationship between age and smoking status? Does this relationship differ by sex?
-
-(2) Is there a relationship between the number of cigarettes smoked per day and age? Does this relationship differ by sex?
-
-(3) The relationship between current smoking status and systolic blood pressure. 
-
-(5) The relationship between current smoking status and diastolic blood pressure. 
-
-(5) The relationship between current smoking status and serum total cholesterol.
-
-#STUDY DESIGN: 
-A brief description of the study design and the data
-
-#METHODS: 
-A methods section describing your statistical analysis (please justify all modeling choices that were made with evidence).
+##################
+# Initial Models #
+##################
 
 
-TO INCLUDE:
+# totchol_fit <- gee(totchol ~ cursmoke + age + factor(sex) + factor(educ)  + bmi + 
+#              diabetes + heartrte + prevchd + prevhyp +  prevstrk + death,
+#            id = randid,
+#            family = "gaussian",
+#            na.action = "na.omit")
+# 
+# round(2 * pnorm(abs(coef(summary(totchol_fit))[,5]), lower.tail = FALSE), 3) 
+# 
+# 
+# sysbp_fit <- gee(sysbp ~ cursmoke + age + factor(sex) + factor(educ)  + bmi + 
+#                      diabetes + heartrte + prevchd + prevstrk + death,
+#                    id = randid,
+#                    family = "gaussian",
+#                    na.action = "na.omit")
+# round(2 * pnorm(abs(coef(summary(sysbp_fit))[,5]), lower.tail = FALSE), 3) 
+# 
+# diabp_fit <- gee(diabp ~ cursmoke + age + factor(sex) + factor(educ)  + bmi + 
+#                      diabetes + heartrte + prevchd + prevstrk +death,
+#                    id = randid,
+#                    family = "gaussian",
+#                    na.action = "na.omit")
+# 
+# round(2 * pnorm(abs(coef(summary(diabp_fit))[,5]), lower.tail = FALSE), 3) 
 
- age - we want to see how smoking status changes as we get older  
- sex - exploratory data analysis showed there were differences  
- education - found in the literature  
- total cholesterol  
- BMI - confounder based on literature   
- diabetes (https://www.cdc.gov/tobacco/data_statistics/sgr/50th-anniversary/pdfs/fs_smoking_diabetes_508.pdf)  
- heart rate -  smoking increases heart rate (in literature)  
- prevchd since prevmi and prevap are correlaed   
- prevstroke  
- prevhyp  
- timedth  
 
-DONT INCLUDE:
-systolic, diastolic bc we have hypertension  
-BPmeds  - not significant   
-LDL and HDL have too many NAs  
-glucose - correlated with diabetes  
+###############################################
+# Models After Removing Non Significant Terms #
+###############################################
 
-#RESULTS: 
-A results section that includes a) descriptive statistics for the data b) a summary of your key findings including supporting numerical summaries (i.e. confidence intervals, pvalues, etc.) c) interpretations of your key findings (i.e. interpretations of coefficients).
+totchol_fit <- gee(totchol ~ cursmoke + age + factor(sex) + bmi + 
+                     diabetes + heartrte  + prevhyp ,
+                   id = randid,
+                   family = "gaussian",
+                   corstr = "unstructured",
+                   na.action = "na.omit")
 
-#CONCLUSION: 
-A conclusion specifically answering the objective of the analysis.
+knitr::kable(summary(totchol_fit)$coefficients[,c(1,4,5)], digits = 3)
+knitr::kable(round(2 * pnorm(abs(coef(summary(totchol_fit))[,5]), lower.tail = FALSE), 3)) 
+QIC(totchol_fit)
 
-#APPENDIX:
+totchol_fit2 <- gee(totchol ~ cursmoke + age + factor(sex) + bmi + 
+                     diabetes + heartrte  + prevhyp ,
+                   id = randid,
+                   family = "gaussian",
+                   corstr = "exchangeable",
+                   na.action = "na.omit")
+
+knitr::kable(summary(totchol_fit2)$coefficients[,c(1,4,5)], digits = 3)
+knitr::kable(round(2 * pnorm(abs(coef(summary(totchol_fit2))[,5]), lower.tail = FALSE), 3)) 
+QIC(totchol_fit2)
+
+sysbp_fit <- gee(sysbp ~ cursmoke + age + factor(sex)  + bmi + 
+                   diabetes + heartrte + prevchd + prevstrk + death,
+                 id = randid,
+                 family = "gaussian",
+                 corstr = "unstructured",
+                 na.action = "na.omit")
+
+knitr::kable(summary(sysbp_fit)$coefficients[,c(1,4,5)], digits = 3)
+knitr::kable(round(2 * pnorm(abs(coef(summary(sysbp_fit))[,5]), lower.tail = FALSE), 3))
+QIC(sysbp_fit)
+
+sysbp_fit2 <- gee(sysbp ~ cursmoke + age + factor(sex)  + bmi + 
+                   diabetes + heartrte + prevchd + prevstrk + death,
+                 id = randid,
+                 family = "gaussian",
+                 corstr = "exchangeable",
+                 na.action = "na.omit")
+
+knitr::kable(summary(sysbp_fit2)$coefficients[,c(1,4,5)], digits = 3)
+knitr::kable(round(2 * pnorm(abs(coef(summary(sysbp_fit2))[,5]), lower.tail = FALSE), 3))
+QIC(sysbp_fit2)
+
+diabp_fit <- gee(diabp ~ cursmoke + factor(sex) + factor(educ) + bmi +
+                   diabetes + heartrte  + prevstrk +death,
+                 id = randid,
+                 family = "gaussian",
+                 corstr = "unstructured",
+                 na.action = "na.omit")
+
+knitr::kable(summary(diabp_fit)$coefficients[,c(1,4,5)], digits = 3)
+knitr::kable(round(2 * pnorm(abs(coef(summary(diabp_fit))[,5]), lower.tail = FALSE), 3))
+QIC(diabp_fit)
+
+diabp_fit2 <- gee(diabp ~ cursmoke + factor(sex) + factor(educ) + bmi +
+                   diabetes + heartrte  + prevstrk +death,
+                 id = randid,
+                 family = "gaussian",
+                 corstr = "exchangeable",
+                 na.action = "na.omit")
+
+knitr::kable(summary(diabp_fit2)$coefficients[,c(1,4,5)], digits = 3)
+knitr::kable(round(2 * pnorm(abs(coef(summary(diabp_fit2))[,5]), lower.tail = FALSE), 3))
+QIC(diabp_fit2)
+
+```
