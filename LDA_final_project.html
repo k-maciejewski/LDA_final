@@ -527,9 +527,14 @@ prob.data</code></pre>
 <h1>Models</h1>
 <pre class="r"><code>library(lme4)
 library(dplyr)</code></pre>
+<<<<<<< HEAD
 <ol style="list-style-type: decimal">
 <li>Is there a relationship between age and smoking status? Does this relationship differ by sex?</li>
 </ol>
+=======
+<div id="is-there-a-relationship-between-age-and-smoking-status-does-this-relationship-differ-by-sex" class="section level2">
+<h2>(1) Is there a relationship between age and smoking status? Does this relationship differ by sex?</h2>
+>>>>>>> d880ad804e9a303c9147a5a0bc6a803495fc455d
 <pre class="r"><code>my.data &lt;- read.csv(&quot;../final_data/frmgham2.csv&quot;)
 library(gee)
 
@@ -644,9 +649,15 @@ model.q1 &lt;- gee(CURSMOKE ~ AGE + as.factor(SEX) + as.factor(educ)
 ## [1,] 1.0000000 0.7563191 0.5136670
 ## [2,] 0.7563191 1.0000000 0.5713635
 ## [3,] 0.5136670 0.5713635 1.0000000</code></pre>
+<<<<<<< HEAD
 <ol start="2" style="list-style-type: decimal">
 <li>Is there a relationship between the number of cigarettes smoked per day and age? Does this relationship differ by sex?</li>
 </ol>
+=======
+</div>
+<div id="is-there-a-relationship-between-the-number-of-cigarettes-smoked-per-day-and-age-does-this-relationship-differ-by-sex" class="section level2">
+<h2>(2) Is there a relationship between the number of cigarettes smoked per day and age? Does this relationship differ by sex?</h2>
+>>>>>>> d880ad804e9a303c9147a5a0bc6a803495fc455d
 <pre class="r"><code>model.q2 &lt;- lmer(CIGPDAY ~ AGE + as.factor(SEX) + 
                    as.factor(educ) + (1|RANDID),
                   data = my.data)</code></pre>
@@ -886,10 +897,18 @@ summary(model.mixed2)</code></pre>
 #                    family = &quot;gaussian&quot;,
 #                    na.action = &quot;na.omit&quot;)
 # 
+<<<<<<< HEAD
 # round(2 * pnorm(abs(coef(summary(diabp_fit))[,5]), lower.tail = FALSE), 3) 
 
 
 ###############################################
+=======
+# round(2 * pnorm(abs(coef(summary(diabp_fit))[,5]), lower.tail = FALSE), 3) </code></pre>
+</div>
+<div id="totchol-and-cursmoke" class="section level2">
+<h2>(3) Totchol and cursmoke</h2>
+<pre class="r"><code>###############################################
+>>>>>>> d880ad804e9a303c9147a5a0bc6a803495fc455d
 # Models After Removing Non Significant Terms #
 ###############################################
 
@@ -1127,6 +1146,12 @@ totchol_fit &lt;- gee(totchol ~ cursmoke + age + factor(sex) + bmi +
 <pre class="r"><code>QIC(totchol_fit2)</code></pre>
 <pre><code>##      QIC 
 ## 84588.27</code></pre>
+<<<<<<< HEAD
+=======
+</div>
+<div id="sysbp-and-cursmoke" class="section level2">
+<h2>(4) Sysbp and cursmoke</h2>
+>>>>>>> d880ad804e9a303c9147a5a0bc6a803495fc455d
 <pre class="r"><code>sysbp_fit &lt;- gee(sysbp ~ cursmoke + age + factor(sex)  + bmi + 
                    diabetes + heartrte + prevchd + prevstrk + death,
                  id = randid,
@@ -1401,6 +1426,12 @@ totchol_fit &lt;- gee(totchol ~ cursmoke + age + factor(sex) + bmi +
 <pre class="r"><code>QIC(sysbp_fit2)</code></pre>
 <pre><code>##      QIC 
 ## 68837.55</code></pre>
+<<<<<<< HEAD
+=======
+</div>
+<div id="diabp-and-cursmoke" class="section level2">
+<h2>(5) Diabp and cursmoke</h2>
+>>>>>>> d880ad804e9a303c9147a5a0bc6a803495fc455d
 <pre class="r"><code>diabp_fit &lt;- gee(diabp ~ cursmoke + factor(sex) + factor(educ) + bmi +
                    diabetes + heartrte  + prevstrk +death,
                  id = randid,
@@ -1700,6 +1731,10 @@ totchol_fit &lt;- gee(totchol ~ cursmoke + age + factor(sex) + bmi +
 <pre><code>##   QIC 
 ## 53508</code></pre>
 </div>
+<<<<<<< HEAD
+=======
+</div>
+>>>>>>> d880ad804e9a303c9147a5a0bc6a803495fc455d
 
 
 
