@@ -1,0 +1,465 @@
+---
+title: "Final Project"
+author: "Volha Tryputsen"
+date: "12/11/2018"
+output:
+  html_document:
+    df_print: paged
+    toc: yes
+    toc_depth: '6'
+  pdf_document:
+    highlight: tango
+    toc: yes
+    toc_depth: 6
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, fig.height = 6, fig.width = 7)
+```
+
+
+```{r libraries}
+library(tidyverse)
+library(janitor)
+library(knitr)
+library(gee)
+library(MuMIn)
+library(forcats)
+library(knitr)
+library(lme4)
+```
+
+
+```{r data}
+dat = 
+  read.csv(file = '../frmgham2.csv') %>%
+  clean_names()
+```
+
+
+```{r eval = FALSE}
+dim(dat)
+
+glimpse(dat)
+head(dat)
+View(dat)
+
+dat %>% select(sex) %>% head()
+```
+
+
+```{r preprocessing}
+dat = 
+  dat %>%
+  mutate(sex = factor(sex)) #%>% fct_recode(sex, "female" =  "2", "male" = "1")
+
+# what variables have more than 70$ data missing
+apply(dat,2,function(x)100*sum(is.na(x))/11627)[apply(dat,2,function(x)100*sum(is.na(x))/11627) > 70]
+
+# exclude those variables( hdlc, ldlc)
+dat = dat[,-c(22, 23)]
+```
+
+
+
+
+# EDA  
+## response vs continuous covariates  
+### (1): Smoking ~ age, sex   
+
+```{r}
+dat %>%
+  select(cursmoke, age) %>% 
+  ggplot(aes(x = age, y = cursmoke)) +
+  geom_jitter(height = 0.1, alpha = 0.1) +
+  geom_smooth(lwd = 1.5) +
+  theme_bw() 
+```
+The proportion of smokers decreases with the age.
+
+
+Smoking ~ age, sex  
+
+```{r}
+dat %>%
+  select(cursmoke, age, sex) %>% 
+  ggplot(aes(x = age, y = cursmoke, group = sex, color = sex)) +
+  geom_jitter(height = 0.1, alpha = 0.1) +
+  geom_smooth(lwd = 1.5) +
+  theme_bw() 
+```
+There is a higher proportion of smoker among men compared to women as both age ,but there is no interaction between age and sex.  
+
+
+### (2): Smoking ~ totchol, sex  
+
+```{r}
+dat %>%
+  select(cursmoke, totchol) %>% 
+  mutate(cursmoke = factor(cursmoke)) %>%
+  ggplot(aes(y = totchol, x = cursmoke)) +
+  geom_boxplot(outlier.colour = "white") +
+  geom_jitter(width = 0.1, alpha = 0.1) +
+  theme_bw() 
+```
+
+
+smoking ~ totchol x sex [interaction]  
+  
+```{r}
+dat %>%
+  select(cursmoke, totchol, sex) %>% 
+  ggplot(aes(x = totchol, y = cursmoke, group = sex, color = sex)) +
+  geom_jitter(height = 0.1, alpha = 0.1) +
+  geom_smooth(lwd = 1.5) +
+  theme_bw() 
+```
+
+Proportion of smokers has non-linear relationship with total cholesterol for women; proprtions increases with increase in total cholesterol for men (sex by totchol interaction effect). 
+
+
+### (3): Smoking ~ sysbp, sex  
+```{r}
+dat %>%
+  select(cursmoke, sysbp, sex) %>% 
+  ggplot(aes(x = sysbp, y = cursmoke, group = sex, color = sex)) +
+  geom_jitter(height = 0.1, alpha = 0.1) +
+  geom_smooth(lwd = 1.5) +
+  theme_bw() 
+```
+
+
+### (4): smoking ~ diabp, sex  
+   
+```{r}
+dat %>%
+  select(cursmoke, diabp, sex) %>% 
+  ggplot(aes(x = diabp, y = cursmoke, group = sex, color = sex)) +
+  geom_jitter(height = 0.1, alpha = 0.1) +
+  geom_smooth(lwd = 1.5) +
+  theme_bw() 
+```
+Proportion of smokers decreases with increase of diastolic blood presure; the proprtions are higher for men (sex effect).  
+
+### (5): smoking ~ cigpday, sex  
+   
+```{r}
+dat %>%
+  select(cursmoke, cigpday, sex) %>% 
+  ggplot(aes(x = cigpday, y = cursmoke, group = sex, color = sex)) +
+  geom_jitter(height = 0.1, alpha = 0.1) +
+  geom_smooth(lwd = 1.5) +
+  theme_bw() 
+```
+
+
+### (6): smoking ~ bmi, sex  
+   
+```{r}
+dat %>%
+  select(cursmoke, bmi, sex) %>% 
+  ggplot(aes(x = bmi, y = cursmoke, group = sex, color = sex)) +
+  geom_jitter(height = 0.1, alpha = 0.1) +
+  geom_smooth(lwd = 1.5) +
+  theme_bw() 
+```
+
+### (7): smoking ~ heartrte, sex  
+   
+```{r}
+dat %>%
+  select(cursmoke, heartrte, sex) %>% 
+  ggplot(aes(x = heartrte, y = cursmoke, group = sex, color = sex)) +
+  geom_jitter(height = 0.1, alpha = 0.1) +
+  geom_smooth(lwd = 1.5) +
+  theme_bw() 
+```
+
+### (8): smoking ~ glucose, sex  
+   
+```{r}
+dat %>%
+  select(cursmoke, glucose, sex) %>% 
+  ggplot(aes(x = glucose, y = cursmoke, group = sex, color = sex)) +
+  geom_jitter(height = 0.1, alpha = 0.1) +
+  geom_smooth(lwd = 1.5) +
+  theme_bw() 
+```
+
+
+### (9): smoking ~ timeap, sex  
+   
+```{r}
+dat %>%
+  select(cursmoke, timeap,sex) %>% 
+  ggplot(aes(x = timeap, y = cursmoke, group = sex, color = sex)) +
+  geom_jitter(height = 0.1, alpha = 0.1) +
+  geom_smooth(lwd = 1.5) +
+  theme_bw() 
+
+```
+
+### (10): smoking ~ timemi, sex [not sig]
+   
+```{r}
+dat %>%
+  select(cursmoke, timemi,sex) %>% 
+  ggplot(aes(x = timemi, y = cursmoke, group = sex, color = sex)) +
+  geom_jitter(height = 0.1, alpha = 0.1) +
+  geom_smooth(lwd = 1.5) +
+  theme_bw() 
+
+```
+
+### (11): smoking ~ timemifc, sex  [not sig]
+   
+```{r}
+dat %>%
+  select(cursmoke, timemifc,sex) %>% 
+  ggplot(aes(x = timemifc, y = cursmoke, group = sex, color = sex)) +
+  geom_jitter(height = 0.1, alpha = 0.1) +
+  geom_smooth(lwd = 1.5) +
+  theme_bw() 
+
+```
+
+### (12): smoking ~ timemchd, sex  [not sig]
+   
+```{r}
+dat %>%
+  select(cursmoke, timechd,sex) %>% 
+  ggplot(aes(x = timechd, y = cursmoke, group = sex, color = sex)) +
+  geom_jitter(height = 0.1, alpha = 0.1) +
+  geom_smooth(lwd = 1.5) +
+  theme_bw() 
+
+```
+
+### (13): smoking ~ timestrk, sex  [not sig]
+   
+```{r}
+dat %>%
+  select(cursmoke, timestrk,sex) %>% 
+  ggplot(aes(x = timestrk, y = cursmoke, group = sex, color = sex)) +
+  geom_jitter(height = 0.1, alpha = 0.1) +
+  geom_smooth(lwd = 1.5) +
+  theme_bw() 
+```
+
+### (14): smoking ~ timecvd, sex  [not sig]
+   
+```{r}
+dat %>%
+  select(cursmoke, timecvd,sex) %>% 
+  ggplot(aes(x = timecvd, y = cursmoke, group = sex, color = sex)) +
+  geom_jitter(height = 0.1, alpha = 0.1) +
+  geom_smooth(lwd = 1.5) +
+  theme_bw() 
+```
+
+### (14): smoking ~ timecvd, sex  [possibly?]
+   
+```{r}
+dat %>%
+  select(cursmoke, timecvd,sex) %>% 
+  ggplot(aes(x = timecvd, y = cursmoke, group = sex, color = sex)) +
+  geom_jitter(height = 0.1, alpha = 0.1) +
+  geom_smooth(lwd = 1.5) +
+  theme_bw() 
+```
+
+### (15): smoking ~ timedth, sex  [possibly?]
+   
+```{r}
+dat %>%
+  select(cursmoke, timedth,sex) %>% 
+  ggplot(aes(x = timedth, y = cursmoke, group = sex, color = sex)) +
+  geom_jitter(height = 0.1, alpha = 0.1) +
+  geom_smooth(lwd = 1.5) +
+  theme_bw() 
+```
+
+### (16): smoking ~ timehyp, sex  [possibly?]
+   
+```{r}
+dat %>%
+  select(cursmoke, timehyp,sex) %>% 
+  ggplot(aes(x = timehyp, y = cursmoke, group = sex, color = sex)) +
+  geom_jitter(height = 0.1, alpha = 0.1) +
+  geom_smooth(lwd = 1.5) +
+  theme_bw() 
+```
+
+
+
+
+## response vs categorical covariates  
+
+### smoking ~ sex  
+   
+```{r}
+c(chisq.test(table(dat$sex[dat$period == 1], dat$cursmoke[dat$period == 1]))$p.value, 
+  chisq.test(table(dat$sex, dat$cursmoke))$p.value)
+```
+
+### smoking ~ diabetes  
+   
+```{r}
+c(chisq.test(table(dat$diabetes[dat$period == 1], dat$cursmoke[dat$period == 1]))$p.value, 
+  chisq.test(table(dat$diabetes, dat$cursmoke))$p.value)
+```
+
+### smoking ~ bpmeds  
+   
+```{r}
+c(chisq.test(table(dat$bpmeds[dat$period == 1], dat$cursmoke[dat$period == 1]))$p.value, 
+  chisq.test(table(dat$bpmeds, dat$cursmoke))$p.value)
+```
+
+
+### smoking ~ educ 
+   
+```{r}
+c(chisq.test(table(dat$educ[dat$period == 1], dat$cursmoke[dat$period == 1]))$p.value, 
+  chisq.test(table(dat$educ, dat$cursmoke))$p.value)
+```
+
+### smoking ~ prevchd 
+   
+```{r}
+c(chisq.test(table(dat$prevchd[dat$period == 1], dat$cursmoke[dat$period == 1]))$p.value, 
+  chisq.test(table(dat$prevchd, dat$cursmoke))$p.value)
+```
+
+### smoking ~ prevap 
+   
+```{r}
+c(chisq.test(table(dat$prevap[dat$period == 1], dat$cursmoke[dat$period == 1]))$p.value, 
+  chisq.test(table(dat$prevap, dat$cursmoke))$p.value)
+```
+
+
+### smoking ~ prevmi [not sig]  
+   
+```{r}
+c(chisq.test(table(dat$prevmi[dat$period == 1], dat$cursmoke[dat$period == 1]))$p.value, 
+  chisq.test(table(dat$prevmi, dat$cursmoke))$p.value)
+```
+
+### smoking ~ prevstrk [sig all]  
+   
+```{r}
+c(chisq.test(table(dat$prevstrk[dat$period == 1], dat$cursmoke[dat$period == 1]))$p.value, 
+  chisq.test(table(dat$prevstrk, dat$cursmoke))$p.value)
+```
+
+
+### smoking ~ prevhyp [1/2 sig]  
+   
+```{r}
+c(chisq.test(table(dat$prevhyp[dat$period == 1], dat$cursmoke[dat$period == 1]))$p.value, 
+  chisq.test(table(dat$prevhyp, dat$cursmoke))$p.value)
+```
+
+### smoking ~ death [1/2 sig]  
+   
+```{r}
+c(chisq.test(table(dat$death[dat$period == 1], dat$cursmoke[dat$period == 1]))$p.value, 
+  chisq.test(table(dat$death, dat$cursmoke))$p.value)
+```
+
+### smoking ~ death [1/2 sig]  
+   
+```{r}
+c(chisq.test(table(dat$death[dat$period == 1], dat$cursmoke[dat$period == 1]))$p.value, 
+  chisq.test(table(dat$death, dat$cursmoke))$p.value)
+```
+
+### smoking ~ angina [1/2 sig]  
+   
+```{r}
+c(chisq.test(table(dat$angina[dat$period == 1], dat$cursmoke[dat$period == 1]))$p.value, 
+  chisq.test(table(dat$angina, dat$cursmoke))$p.value)
+```
+
+
+### smoking ~ mi_fchd  
+   
+```{r}
+c(chisq.test(table(dat$mi_fchd[dat$period == 1], dat$cursmoke[dat$period == 1]))$p.value, 
+  chisq.test(table(dat$mi_fchd, dat$cursmoke))$p.value)
+```
+
+### smoking ~ anychd [not sig]  
+   
+```{r}
+c(chisq.test(table(dat$anychd[dat$period == 1], dat$cursmoke[dat$period == 1]))$p.value, 
+  chisq.test(table(dat$anychd, dat$cursmoke))$p.value)
+```
+
+### smoking ~ stroke [not sig]  
+   
+```{r}
+c(chisq.test(table(dat$stroke[dat$period == 1], dat$cursmoke[dat$period == 1]))$p.value, 
+  chisq.test(table(dat$stroke, dat$cursmoke))$p.value)
+```
+
+### smoking ~ cvd [borderline sig]  
+   
+```{r}
+c(chisq.test(table(dat$cvd[dat$period == 1], dat$cursmoke[dat$period == 1]))$p.value, 
+  chisq.test(table(dat$cvd, dat$cursmoke))$p.value)
+```
+
+### smoking ~ hyperten [highly sig]  
+   
+```{r}
+c(chisq.test(table(dat$hyperten[dat$period == 1], dat$cursmoke[dat$period == 1]))$p.value, 
+  chisq.test(table(dat$hyperten, dat$cursmoke))$p.value)
+```
+
+
+
+
+## pairwise correlations  
+```{r}
+dat[,-c(1,2, 20)] %>%
+  cor(., use = "complete.obs") %>%
+  corrplot::corrplot(., type = "upper", order = "hclust", 
+         tl.col = "black", tl.srt = 75, tl.offset = 1, tl.cex = .8, method = "ellipse")
+```
+
+
+
+# Model  
+```{r}
+m1 = lme4::glmer(cursmoke ~ age + sex + as.factor(educ) + (1|randid), family = binomial, data = dat)
+m2 = lme4::glmer(cursmoke ~ age + sex + as.factor(educ) + bmi + (1|randid), family = binomial, data = dat)
+
+# m3a didnt converge
+m3a = lme4::glmer(cursmoke ~ age + sex + as.factor(educ) + bmi + heartrte + (1|randid), family = binomial, data = dat)
+# m3b didnt converge
+m3b= lme4::glmer(cursmoke ~ age + sex + as.factor(educ) + bmi + as.factor(prevstrk)  + (1|randid), family = binomial, data = dat)
+
+
+m3c =
+  dat %>%
+  select(cursmoke, age, sex, educ, bmi, totchol) %>%
+  na.omit() %>%
+  lme4::glmer(cursmoke ~ age + sex + as.factor(educ) + bmi + log(totchol) + (1|randid), family = binomial, data = .)
+
+
+
+m4 = lme4::glmer(cursmoke ~ age + sex + as.factor(educ) + bmi + (1|randid), family = binomial, data = dat)
+
+AIC(m2, m3)
+
+summary(m2)
+
+apply(dat,2,function(x)100*sum(is.na(x))/11627)
+```
+
+
+
