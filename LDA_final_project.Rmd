@@ -280,6 +280,20 @@ prob.data
 table(data$period)
 ```
 
+# Summary
+```{r, summary}
+table(data$cursmoke, data$period)
+data1 <- filter(data,period == "1")
+summary(data1$age)
+table(data1$sex)
+data2 <- filter(data1,cursmoke == "yes")
+summary(data1$cigpday)
+summary(data2$cigpday)
+summary(data1$totchol)
+summary(data1$diabp)
+summary(data1$sysbp)
+```
+
 # Models
 
 ```{r}
