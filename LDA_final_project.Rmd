@@ -301,6 +301,19 @@ model.q1 <- gee(CURSMOKE ~ AGE + as.factor(SEX) + as.factor(educ)
                  corstr = "unstructured")
 knitr::kable(summary(model.q1)$coefficients[,c(1,4,5)], digits = 3)
 model.q1[["working.correlation"]]
+QIC(model.q1)
+
+model.q1 <- gee(CURSMOKE ~ AGE + as.factor(SEX) + as.factor(educ) 
+                 + BMI + DIABETES + HEARTRTE + PREVCHD + PREVSTRK 
+                 + PREVHYP + TIMEDTH, 
+                 id = RANDID,
+                 data = my.data,
+                 family=binomial, 
+                 corstr = "exchangeable")
+knitr::kable(summary(model.q1)$coefficients[,c(1,4,5)], digits = 3)
+model.q1[["working.correlation"]]
+QIC(model.q1)
+
 ```
 
 ## (2) Is there a relationship between the number of cigarettes smoked per day and age? Does this relationship differ by sex?
@@ -322,6 +335,20 @@ model.q2_1 <- gee(CIGPDAY ~ AGE + as.factor(SEX) + as.factor(educ)
 knitr::kable(summary(model.q2_1)$coefficients[,c(1,4,5)], digits = 3)
 
 model.q2_1[["working.correlation"]]
+QIC(model.q2_1)
+
+model.q2_1 <- gee(CIGPDAY ~ AGE + as.factor(SEX) + as.factor(educ) 
+                 + BMI + DIABETES + HEARTRTE + PREVCHD + PREVSTRK 
+                 + PREVHYP + TIMEDTH,
+                  data = my.data,
+                  id = RANDID,
+                  family=poisson,
+                  corstr = "exchangeable")
+knitr::kable(summary(model.q2_1)$coefficients[,c(1,4,5)], digits = 3)
+
+model.q2_1[["working.correlation"]]
+QIC(model.q2_1)
+
 ```
 
 Using mixed effect model using cig per day instead of smoking status:
@@ -346,7 +373,7 @@ model.mixed2 <- lmer(CIGPDAY~ AGE + as.factor(SEX) + SYSBP
 summary(model.mixed2)
 ```
 
-```{r}
+```{r, echo = F}
 library(dplyr)
 
 ##################
@@ -406,6 +433,7 @@ totchol_fit2 <- gee(totchol ~ cursmoke + age + factor(sex) + bmi +
 knitr::kable(summary(totchol_fit2)$coefficients[,c(1,4,5)], digits = 3)
 knitr::kable(round(2 * pnorm(abs(coef(summary(totchol_fit2))[,5]), lower.tail = FALSE), 3)) 
 QIC(totchol_fit2)
+
 ```
 
 ## (4) Sysbp and cursmoke
@@ -431,6 +459,7 @@ sysbp_fit2 <- gee(sysbp ~ cursmoke + age + factor(sex)  + bmi +
 knitr::kable(summary(sysbp_fit2)$coefficients[,c(1,4,5)], digits = 3)
 knitr::kable(round(2 * pnorm(abs(coef(summary(sysbp_fit2))[,5]), lower.tail = FALSE), 3))
 QIC(sysbp_fit2)
+
 ```
 
 ## (5) Diabp and cursmoke
