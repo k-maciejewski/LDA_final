@@ -2,12 +2,12 @@
 title: "LDA final project"
 author: "Kaitlin Maciejewski, Morgan de Ferrante, Bingnan Li, Volha Tryputsen"
 output:
-  html_document:
-    df_print: paged
-    toc: yes
-    toc_depth: '6'
-    toc_float: true
-    code_folding: hide
+  # html_document:
+  #   df_print: paged
+  #   toc: yes
+  #   toc_depth: '6'
+  #   toc_float: true
+  #   code_folding: hide
   pdf_document:
     highlight: tango
     toc: yes
@@ -287,8 +287,7 @@ library(lme4)
 library(dplyr)
 ```
 
-(1) Is there a relationship between age and smoking status? 
-Does this relationship differ by sex?
+## (1) Is there a relationship between age and smoking status? Does this relationship differ by sex?
 ```{r}
 my.data <- read.csv("../final_data/frmgham2.csv")
 library(gee)
@@ -304,8 +303,7 @@ knitr::kable(summary(model.q1)$coefficients[,c(1,4,5)], digits = 3)
 model.q1[["working.correlation"]]
 ```
 
-(2) Is there a relationship between the number of cigarettes smoked per day and age? 
-Does this relationship differ by sex?
+## (2) Is there a relationship between the number of cigarettes smoked per day and age? Does this relationship differ by sex?
 ```{r}
 model.q2 <- lmer(CIGPDAY ~ AGE + as.factor(SEX) + 
                    as.factor(educ) + (1|RANDID),
@@ -379,8 +377,10 @@ library(dplyr)
 #                    na.action = "na.omit")
 # 
 # round(2 * pnorm(abs(coef(summary(diabp_fit))[,5]), lower.tail = FALSE), 3) 
+```
 
-
+## (3) Totchol and cursmoke
+```{r}
 ###############################################
 # Models After Removing Non Significant Terms #
 ###############################################
@@ -406,7 +406,10 @@ totchol_fit2 <- gee(totchol ~ cursmoke + age + factor(sex) + bmi +
 knitr::kable(summary(totchol_fit2)$coefficients[,c(1,4,5)], digits = 3)
 knitr::kable(round(2 * pnorm(abs(coef(summary(totchol_fit2))[,5]), lower.tail = FALSE), 3)) 
 QIC(totchol_fit2)
+```
 
+## (4) Sysbp and cursmoke
+```{r}
 sysbp_fit <- gee(sysbp ~ cursmoke + age + factor(sex)  + bmi + 
                    diabetes + heartrte + prevchd + prevstrk + death,
                  id = randid,
@@ -428,7 +431,10 @@ sysbp_fit2 <- gee(sysbp ~ cursmoke + age + factor(sex)  + bmi +
 knitr::kable(summary(sysbp_fit2)$coefficients[,c(1,4,5)], digits = 3)
 knitr::kable(round(2 * pnorm(abs(coef(summary(sysbp_fit2))[,5]), lower.tail = FALSE), 3))
 QIC(sysbp_fit2)
+```
 
+## (5) Diabp and cursmoke
+```{r}
 diabp_fit <- gee(diabp ~ cursmoke + factor(sex) + factor(educ) + bmi +
                    diabetes + heartrte  + prevstrk +death,
                  id = randid,
