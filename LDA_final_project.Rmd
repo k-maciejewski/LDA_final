@@ -2,12 +2,12 @@
 title: "LDA final project"
 author: "Kaitlin Maciejewski, Morgan de Ferrante, Bingnan Li, Volha Tryputsen"
 output:
-  html_document:
-    df_print: paged
-    toc: yes
-    toc_depth: '6'
-    toc_float: true
-    code_folding: hide
+  # html_document:
+  #   df_print: paged
+  #   toc: yes
+  #   toc_depth: '6'
+  #   toc_float: true
+  #   code_folding: hide
   pdf_document:
     highlight: tango
     toc: yes
@@ -34,9 +34,6 @@ attach(data)
 ANS: Yes, the proportion of smokers decreases with the age.  
 
 ```{r, smoke_v_age}
-data$sex <- recode(data$sex, `1` = "male", `2` = "female")
-data$cursmoke <- recode(data$cursmoke, `1` = "yes", `0` = "no")
-
 smoke_v_age = data %>%
   select(cursmoke, age) %>% 
   ggplot(aes(x = age, y = cursmoke)) +
@@ -44,6 +41,7 @@ smoke_v_age = data %>%
   geom_smooth(lwd = 1.5) +
   theme_bw() 
 ```
+
 
 ### Does this relationship differ by sex?  
 ANS: There is a higher proportion of smoker among men compared to women as both age ,but there is no interaction between age and sex.      
@@ -56,11 +54,13 @@ smoke_age_sex = data %>%
   theme_bw() 
 ```
 
+
 ## (2) number of cigarettes  ~ age, sex 
 ### Is there a relationship between the number of cigarettes smoked per day and age?   
 ANS: Yes, number of sigarets smoked per day stays constant for 30-50 years old and decreases with age after 50 years old.   
 
 #### All 
+
 ```{r, n_c_age_all}
 n_c_age_all = data %>%
   select(cigpday, age) %>% 
@@ -70,7 +70,9 @@ n_c_age_all = data %>%
   theme_bw() 
 ```
 
+
 #### Smokers only  
+
 ```{r, n_c_age_smoke}
 n_c_age_smoke = data %>%
   select(cigpday, age) %>% 
@@ -151,6 +153,7 @@ smoke_sysbp_sex_status = data %>%
   theme_bw() 
 ```
 
+
 ## (2) The relationship between current smoking status and diastolic blood pressure.  
 
 ### smoking ~ diabp  
@@ -196,6 +199,7 @@ smoke_dbp_s_bp = data %>%
   theme_bw() 
 ```
 
+
 ## (3) The relationship between current smoking status and serum total cholesterol.  
 ### smoking ~ totchol   
 ANS: Proportion of smokers slightly decreases with increase of total cholesterol values   
@@ -217,6 +221,7 @@ smoke_tc_bp = data %>%
   geom_boxplot(outlier.colour = "white") +
   theme_bw() 
 ```
+
 
 ### smoking ~ totchol, sex [!!!]  
 ANS: Proportion of smokers hasnonlinera relationship with total cholesterol for women; proprtions increases with increase in total cholesterol for men (sex by totchol interaction effect).     
@@ -246,11 +251,12 @@ smoke_sysbp_sex
 smoke_tc_sex
 ```
 
+
 ## Cor plot
 ```{r}
 library(dplyr)
 
-corr <- data[,c(-1,-2,-7,-21)] %>% cor(., use = "complete.obs") 
+corr <- data[,c(-1,-21)] %>% cor(., use = "complete.obs") 
 
 library(corrplot)
 
@@ -258,6 +264,7 @@ corrplot(corr, type = "upper", order = "hclust",
          tl.col = "black", tl.srt = 75, 
          tl.offset = 1, tl.cex= .8, method = "ellipse")
 ```
+
 
 ## Missingness
 ```{r, missingness}
@@ -272,18 +279,6 @@ prob.data
 
 table(data$period)
 ```
-
-# Summary
-```{r, summary}
-summary(age)
-table(data$cursmoke, data$period)
-table(data$sex, data$period)
-summary(cigpday)
-summary(totchol)
-summary(diabp)
-summary(sysbp)
-```
-
 
 # Models
 
