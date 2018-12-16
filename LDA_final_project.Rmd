@@ -127,12 +127,16 @@ library(corrplot)
 corrplot(corr, type = "upper", order = "hclust",
          tl.col = "black", tl.srt = 75, 
          tl.offset = 1, tl.cex= .8, method = "ellipse")
+
 ```
  
 *Code*
 
 ```{r, eval = F}
 # Exploratory
+
+library(psych) 
+knitr::kable(describe(data)[,c(2,3,4,5,8,9,10,13)], digits = 3)
 
 ## Smoking vs. Age, Sex
 ## (1): Smoking ~ age, sex  
@@ -314,9 +318,73 @@ smoke_tc_sex_bp = data %>%
   geom_boxplot(outlier.colour = "white") +
   theme_bw() 
 
-smoke_age_sex
-smoke_sysbp_sex
-smoke_tc_sex
+library(ggplot2)
+
+ggplot(data= data, aes(age, cigpday)) + 
+  geom_point(alpha = .6) +
+  geom_smooth(method = 'lm', col = 'red') + 
+  geom_smooth(method = 'loess') +
+  ggtitle("cigpday vs Age Scatterplot")
+
+ggplot(data=data, aes(age, cigpday, group = randid)) + 
+  geom_path(alpha = .6) +
+  geom_smooth(aes(group = NULL), method = 'lm', col = 'red') + 
+  geom_smooth(aes(group = NULL), method = 'loess') +
+  ggtitle("cigpday vs Age Spaghetti Plot")
+
+###
+
+# data.residual <- data %>% na.omit()  %>% 
+# group_by(age) %>%
+# mutate(mean.cigpday = mean(cigpday)) %>%
+# ungroup() %>%
+# mutate(residuals = cigpday - mean.cigpday) %>%
+# group_by(randid) %>%
+# mutate(median.residual = median(residuals)) %>%
+# ungroup() 
+# 
+# data.stats <- c(min(data.residual$median.residual),
+# quantile(data.residual$median.residual,
+# c(.25, .5, .75)), max(data.residual$median.residual))
+# 
+# data.id.select <- data.residual %>%
+# filter(median.residual %in% data.stats) 
+# 
+# data.residual.plot <- ggplot() +
+# geom_line(data = data.id.select,
+# aes(x = age, y = cigpday, group = randid)) +
+# ggtitle("cigpday by time, Selected from Residuals") +
+# geom_smooth(data = data,
+# aes(x = age, y = cigpday))
+
+###
+
+ggplot(data, aes(y = cursmoke, x = age)) + geom_jitter(height = 0.1) +
+stat_summary(fun.y = 'mean', geom="line", col = 'red')
+
+select(data, -c(randid, time,timeap:timehyp)) %>% GGally::ggcorr(.)
+
+
+corr <- data[,c(-1,-21)] %>% cor(., use = "complete.obs")
+library(corrplot)
+corrplot(corr, type = "upper", order = "hclust", 
+         tl.col = "black", tl.srt = 75, tl.offset = 1, tl.cex = .8, method = "ellipse")
+
+corr2 <- data[,c(2,3,4,5,6,7,8,10,11,12,13,14)] %>% cor(., use = "complete.obs")
+corrplot(corr2, type = "upper", order = "hclust", 
+         tl.col = "black", tl.srt = 45)
+
+
+ggplot(data = data,
+aes(x = as.factor(cursmoke), y = age)) +
+geom_violin() +
+  facet_wrap(~sex)
+
+ggplot(data = data,
+aes(x = cigpday, y = age)) +
+geom_point() +
+  facet_wrap(~sex) +
+  geom_smooth()
 
 ## Cor plot
 
@@ -356,6 +424,82 @@ summary(data1$sysbp)
 
 
 # Models
+
+# glmer
+
+library(lme4)
+
+smoke_stat_age <- glmer(cursmoke~age+educ + (1|randid), family=binomial, na.action = "na.omit")
+
+knitr::kable(summary(smoke_stat_age)$coefficients,digits = 3)
+
+smoke_stat_sex <- glmer(cursmoke~age+educ + as.factor(sex) + (1|randid), family=binomial, na.action = "na.omit")
+
+knitr::kable(summary(smoke_stat_sex)$coefficients,digits = 3)
+```
+
+
+(2) Is there a relationship between the number of cigarettes smoked per day and age? Does this relationship differ by sex?
+```{r}
+cigpday_age <- glmer(cigpday~age+educ +(1|randid), family=poisson, na.action = "na.omit")
+
+knitr::kable(summary(cigpday_age)$coefficients, digits = 3)
+
+ncig_gee <- glmer(cigpday~age+as.factor(sex) + educ+ (1|randid), family=poisson, na.action = "na.omit")
+
+knitr::kable(summary(ncig_gee)$coefficients,digits = 3)
+```
+
+(1) The relationship between current smoking status and systolic blood pressure. 
+```{r}
+smoke_sys<-glmer(cursmoke~sysbp + (1|randid), family=binomial, na.action = "na.omit") 
+
+knitr::kable(summary(smoke_sys)$coefficients,digits = 3)
+
+smoke_sys<-glmer(cursmoke~sysbp + as.factor(sex) + (1|randid), family=binomial, na.action = "na.omit") 
+
+knitr::kable(summary(smoke_sys)$coefficients,digits = 3)
+```
+
+(2) The relationship between current smoking status and diastolic blood pressure. 
+```{r}
+smoke_dias<-glmer(cursmoke~diabp + (1|randid), family=binomial,  na.action = "na.omit")
+
+knitr::kable(summary(smoke_dias)$coefficients,digits = 3)
+
+smoke_dias<-glmer(cursmoke~diabp + as.factor(sex) + (1|randid), family=binomial,  na.action = "na.omit")
+
+knitr::kable(summary(smoke_dias)$coefficients,digits = 3)
+```
+
+(3) The relationship between current smoking status and serum total cholesterol.
+```{r}
+smoke_chol<-glmer(cursmoke~totchol + (1|randid), family=binomial, na.action = "na.omit")
+
+knitr::kable(summary(smoke_chol)$coefficients,digits = 3)
+
+smoke_chol<-glmer(cursmoke~totchol + as.factor(sex) + (1|randid), family=binomial,  na.action = "na.omit")
+
+knitr::kable(summary(smoke_chol)$coefficients,digits = 3)
+
+###
+
+my.data.complete <- data %>%
+  dplyr::select(-c(hdlc,ldlc)) %>%
+  na.omit()
+
+model.saturated <- geepack::geeglm(formula = cursmoke ~ as.factor(sex) + 
+    age + age * as.factor(sex) + sysbp + diabp + sysbp * diabp + 
+    bpmeds + as.factor(educ) + totchol + bmi + glucose + diabetes + 
+    heartrte + prevap + prevchd + prevmi + prevstrk + prevhyp, 
+    family = binomial, data = my.data.complete, id = randid, 
+    corstr = ("unstructured"))
+
+model <- aov(model.saturated)
+car::vif(model)
+
+
+# Gee
 
 ## (1) Is there a relationship between age and smoking status? Does this relationship differ by sex?
 
@@ -519,5 +663,119 @@ diabp_fit2 <- gee(diabp ~ cursmoke + factor(sex) + factor(educ) + bmi +
 knitr::kable(summary(diabp_fit2)$coefficients[,c(1,4,5)], digits = 3)
 knitr::kable(round(2 * pnorm(abs(coef(summary(diabp_fit2))[,5]), lower.tail = FALSE), 3))
 QIC(diabp_fit2)
+
+###
+
+
+
+
+# (1) Is there a relationship between age and smoking status? 
+# Does this relationship differ by sex?
+
+model.q1 <- glmer(CURSMOKE ~ AGE + as.factor(SEX) + AGE:as.factor(SEX) + as.factor(educ)
+                 + BMI + DIABETES + HEARTRTE + PREVCHD + PREVSTRK 
+                 + PREVHYP + TIMEDTH + (1|RANDID),
+                 data = my.data,
+                 family=binomial,
+                 corstr = "exchangeable", nAGQ = 0)
+summary(model.q1)
+exp(coef(summary(model.q1)))
+
+# diabetes, prevstrk, prevhyp not significant at a =.1
+
+model.q1 <- glmer(CURSMOKE ~ AGE + as.factor(SEX) + AGE:as.factor(SEX) + as.factor(educ)
+                 + BMI + HEARTRTE + PREVCHD + TIMEDTH + (1|RANDID),
+                 data = my.data,
+                 family="binomial",
+                 corstr = "exchangeable", nAGQ = 0)
+summary(model.q1)
+exp(coef(summary(model.q1)))
+
+# We can see from the model that with age increases 1, the log odds ratio of smoking against non-smoking is -0.051.
+# 
+# Which means that with age incraeses 1, the odds ratio of smoking against non-smoking is 1.0523. The odds of currently smoking is 5% lower than the odds of currently not smoking with the age incraeses 1 unit.
+# 
+# We can see that both age and sex have a p-value less than 0.05. Thus, sex can differ the relationship between age and smoking status. For women, the log odds ratio of smoking against non-smoking is -0.76 as the age increases 1. Thus, for women, the odds of smoking against non-smoking is 53.2% lower with the age increases 1 unit.
+
+# (2) Is there a relationship between the number of cigarettes smoked per day and age? 
+# Does this relationship differ by sex?
+
+model.q2 <- lmer(CIGPDAY ~ AGE + as.factor(SEX) + as.factor(educ) + (1|RANDID),
+                  data = my.data)
+summary(model.q2)
+
+# If we think cig per day as count data, it follows poisson distribution.
+# Then we can fit GEE model as well:
+
+model.q2_1 <- glmer(CIGPDAY ~ AGE + as.factor(SEX) + AGE:as.factor(SEX) + as.factor(educ) + BMI + DIABETES + HEARTRTE + PREVCHD + PREVSTRK + (1|RANDID) 
+                 + PREVHYP + TIMEDTH,
+                  data = my.data,
+                  na.action = "na.omit",
+                  family="poisson",
+                  corstr = "exchangeable", nAGQ = 0)
+summary(model.q2_1)
+exp(coef(summary(model.q2_1)))
+
+# prevhyp not sig
+
+model.q2_1 <- glmer(CIGPDAY ~ AGE + as.factor(SEX) + AGE:as.factor(SEX) + as.factor(educ) + BMI + DIABETES + HEARTRTE + PREVCHD + PREVSTRK + (1|RANDID) 
+                  + TIMEDTH,
+                  data = my.data,
+                  na.action = "na.omit",
+                  family="poisson",
+                  corstr = "exchangeable", nAGQ = 0)
+summary(model.q2_1)
+exp(coef(summary(model.q2_1)))
+
+# From the result we can see that the p-value of age and sex are both show significance. Thus, sex can differ the relationship between cigraettes per day.
+# 
+# From the model that with age increases 1, the number of cigarettes per day will decrease 2.32% at a population level for men.
+# 
+# For women, cigaretees per day will decrease 55.9% with one unit of age increases at a population level.
+
+## (3) Totchol and cursmoke
+
+totchol_fit <- glmer(TOTCHOL ~ AGE + as.factor(SEX) + AGE:as.factor(SEX) + as.factor(educ) + BMI + DIABETES + HEARTRTE + PREVCHD + PREVSTRK + (1|RANDID) 
+                 + PREVHYP + TIMEDTH,
+                  data = my.data,
+                  na.action = "na.omit",
+                  family="poisson",
+                  corstr = "exchangeable", nAGQ = 0)
+summary(totchol_fit)
+
+#prevstrk not sig
+
+totchol_fit <- glmer(TOTCHOL ~ AGE + as.factor(SEX) + AGE:as.factor(SEX) + as.factor(educ) + BMI + DIABETES + HEARTRTE + PREVCHD + (1|RANDID) 
+                 + PREVHYP + TIMEDTH,
+                  data = my.data,
+                  na.action = "na.omit",
+                  family="poisson",
+                  corstr = "exchangeable", nAGQ = 0)
+summary(totchol_fit)
+
+
+## (4) Sysbp and cursmoke
+
+# treat as gaussian??
+
+sysbp_fit <- lmer(SYSBP ~ AGE + as.factor(SEX) + as.factor(educ) + BMI + DIABETES + HEARTRTE + PREVCHD + PREVSTRK + (1|RANDID) 
+                 + PREVHYP + TIMEDTH,
+                  data = my.data,
+                  na.action = "na.omit",
+                  corstr = "exchangeable", nAGQ = 0)
+
+summary(sysbp_fit)
+
+
+## (5) Diabp and cursmoke
+
+diabp_fit <- glmer(DIABP ~ AGE + as.factor(SEX) + as.factor(educ) + BMI + DIABETES + HEARTRTE + PREVCHD + PREVSTRK + (1|RANDID) 
+                 + PREVHYP + TIMEDTH,
+                  data = my.data,
+                  na.action = "na.omit",
+                  family=poisson,
+                  corstr = "exchangeable", nAGQ = 0)
+
+summary(diabp_fit)
 
 ```
