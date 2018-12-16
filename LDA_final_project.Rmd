@@ -2,16 +2,8 @@
 title: "LDA final project"
 author: "Kaitlin Maciejewski, Morgan de Ferrante, Bingnan Li, Volha Tryputsen"
 output:
-  # html_document:
-  #   df_print: paged
-  #   toc: yes
-  #   toc_depth: '6'
-  #   toc_float: true
-  #   code_folding: hide
   pdf_document:
     highlight: tango
-    toc: yes
-    toc_depth: 6
 editor_options: 
   chunk_output_type: console
 ---
@@ -46,8 +38,12 @@ In formal analysis we used longitudinal generalized estimating equations (GEEs) 
 **RESULTS:**
 Among subjects at first observation, age ranged from 32 to 70 years, with a mean of 49.93 years. Of the 4,434 participants, 1,944 were male and 2,490 were female. 2,181 were current smokers and 2,253 were not. Total cholesterol for all subjects ranged from 107 to 696, with a mean of 237. Diastolic blood pressure ranged from 48 to 142.5, with a mean of 83.08. Systolic blood pressure ranged from 83.5 to 295, with a mean of 132.9. Cigarettes smoked per day ranged from 0 to 70, with a mean of 8.97 for all subjects. For smokers, cigarettes smoked per day ranged from 1 to 70, with a mean of 18.37.   
 
-(1) model for current smoking status:
-Model: cursmoke ~ age + as.factor(sex) + age:as.factor(sex) + as.factor(educ) + bmi + diabetes + heartrte+ prevchd + prevstrk + prevhyp + timedth, id = randid, corstr = 'exchangeable’ (show beta’s?) 
+(1) model for current smoking status: 
+
+cursmoke ~ 5.269 + -0.053 age + -0.739 sex = female + 0.072 educ = 2 -0.181 educ = 3 -0.215 educ = 4 + -0.085 bmi + 0.009 heartrte + -0.290 prevchd 
+
+(note: education 1=0-11 years; 
+2=High School Diploma; GED 3=Some College, Vocational School; 4=College (BS, BA) degree or more)
 
 From the significance of age and sex, we can find that both age and sex are significant under the significance level of 0.05, with both p-values less than 0.001. Also, for the interaction term (age:as.factor), the p-value is also significant. Thus, sex could differ this relationship, after adjusting for BMI, diabetes, heart rate, and prevalence of congenial heart disease, prevalence of stroke and time to death. 
 
@@ -55,7 +51,7 @@ The coefficient for age is –0.0594, for sex is –1.57, for interaction is 0.0
 
 (2) model for number of cigarettes per day
 
-Model: cigpday ~ age + as.factor(sex) + age:as.factor(sex) + as.factor(educ) + diabetes + heartrte + prevchd + prevstrk + preyp + timedth, id = randid, family=poisson, corstr = 'exchangeable’
+cigpday ~ 4.430 + -0.022 age + -0.833 sex = female + 0.097 educ = 2 + -0.071 educ = 3 + -0.065 educ = 4 + -0.039 bmi + -0.123 diabetes + 0.007 heartrte +  -0.273 prevchd
 
 From the significance of age and sex, we can find that both age and sex are significant under the significance level of 0.05, with both p-values less than 0.001. Also, for the interaction term (age:as.factor), the p-value is 0.001. Thus, sex could differ cigarettes per day with age, after adjusting for BMI, diabetes, heart rate, and prevalence of congenial heart disease, prevalence of stroke and time to death.
 
@@ -63,27 +59,31 @@ The coefficient for age is –0.0266, for sex is –1.21, for interaction is 0.0
 
 (3) systolic blood pressure
 
-Model: sysbp ~ cursmoke + age + factor(sex)  + bmi +  diabetes + heartrte + prevchd + prevstrk + death (show beta’s?)
+sysbp ~ 43.000 + -0.772 cursmoke = yes + 0.741 age + 3.321 sex = female  + 1.370 bmi + 3.173 diabetes + 0.172 heartrte + 1.553 prevchd + 4.201 prevstrk + 7.794 death
 
 Our model using current smoking status after adjusting for age, sex, BMI, diabetes, heart rate, and prevalence of congenial heart disease, prevalence of stroke and death to predict systolic blood pressure had QIC of 68843.21. Current smoking status was highly significant in the model (p = 0.029). Those who did not smoke have an average systolic blood pressure over time of 40.12, and those who did smoke have an average systolic blood pressure of 3.  
 
 (4) diastolic blood pressure 
 
-Model: diabp ~ cursmoke  + factor(sex) + factor(educ)  + bmi + diabetes + heartrte  + prevstrk +death  
+diabp ~ 48.526 + -0.525 cursmoke  + -0.518 sex = female + 0.857 educ = 2 + 0.776 educ = 3 + 0.531 educ = 4  + 0.991 bmi + -2.072 diabetes + 0.106 heartrte  + 1.049 prevstrk + 3.317 death  
 
 Our model using current smoking status and adjusting for education, BMI, diabetes, heart rate, and prevalence of stroke and death to predict diastolic blood pressure had QIC of 53509.72. Current smoking status was highly significant in the model (p = 0.000). Those who did not smoke have an average diastolic blood pressure over time of 47.35, and those who did smoke have an average diastolic blood pressure of 46.25. 
 
 (5) serum total cholesterol: 
-Model: totchol ~ cursmoke + age + factor(sex) + bmi + diabetes + heartrte  + prevhyp  
+
+totchol ~ 157.548 + 3.824 cursmoke = yes + 0.402 age + 13.291 sex = female  + 1.656 bmi + -7.648 + 0.118 heartrte  + 2.423 prevhyp  
 
 Our model using current smoking status and adjusting for age, sex, BMI, diabetes , heart rate, and prevalence of hypertension to predict total cholesterol had QIC of 84596.03. Current smoking status was significant in the model (p = 0.04). Those who did not smoke have an average total cholesterol over time of 162.1, and those who did smoke have an average cholesterol of 164.47.  
   
 **CONCLUSION:**
 A conclusion specifically answering the objective of the analysis.  
   
+  
+\newpage
+  
 **REFERENCES:**
   
-[1] diabetes (https://www.cdc.gov/tobacco/data_statistics/sgr/50th-anniversary/pdfs/fs_smoking_diabetes_508.pdf)   
+[1] Smoking and diabetes, CDC, (https://www.cdc.gov/tobacco/data_statistics/sgr/50th-anniversary/pdfs/fs_smoking_diabetes_508.pdf)  
 
 [2] Education: The Effect of Education on Smoking Behavior: New Evidence from Smoking Durations of a. Sample of Twins. IZA DP No. 4796. March 2010. Pierre Koning (http://ftp.iza.org/dp4796.pdf) 
 
@@ -93,7 +93,9 @@ A conclusion specifically answering the objective of the analysis.
 
 *Figures*
 
-```{r, echo = F, out.width = "50%", fig.show = "hold"}
+Figure 1: Smoking status vs covariates
+
+```{r, echo = F}
 #(1)
 smoke_age_sex = data %>%
   mutate(sex = as.factor(sex)) %>%
@@ -148,21 +150,11 @@ smoke_totchol_sex =
   data %>%
   mutate(sex = as.factor(sex), cursmoke = as.factor(cursmoke)) %>%
   select(cursmoke, totchol, sex) %>% 
-  ggplot(aes(y = log(totchol), x = cursmoke, color = sex)) +
+  ggplot(aes(y = totchol, x = cursmoke, color = sex)) +
   geom_boxplot() +
   facet_wrap(~sex) + 
   theme_bw()
 
-#smoke_tc_sex = data %>%
-#  select(cursmoke, totchol, sex) %>% 
-#  ggplot(aes(x = totchol, y = cursmoke, group = sex, color = sex)) +
-#  geom_jitter(height = 0.1, alpha = 0.1) +
-#  geom_smooth(lwd = 1.5) +
-#  theme_bw() 
-
-#smoke_age_sex
-#smoke_sysbp_sex
-#smoke_tc_sex
 
 
 ## Cor plot
@@ -171,9 +163,15 @@ corr <- data[,c(-1,-21)] %>% cor(., use = "complete.obs")
 
 library(corrplot)
 library(gridExtra)
+
 grid.arrange(smoke_age_sex, cigpday_age_sex, smoke_sysbp_sex, smoke_diabp_sex, smoke_totchol_sex, 
              layout_matrix = rbind(c(1,2, NA), c(3,4,5)), nrow = 2)
 
+```
+
+Figure 2: Correlation plot
+
+```{r, echo = F}
 corrplot(corr, type = "upper", order = "hclust",
          tl.col = "black", tl.srt = 75, 
          tl.offset = 1, tl.cex= .8, method = "ellipse")
@@ -574,6 +572,20 @@ model.q1 <- gee(CURSMOKE ~ AGE + as.factor(SEX) + as.factor(educ)
                  family=binomial, 
                  corstr = "exchangeable")
 knitr::kable(summary(model.q1)$coefficients[,c(1,4,5)], digits = 3)
+round(2 * pnorm(abs(coef(summary(model.q1))[,5]), lower.tail = FALSE), 3) 
+model.q1[["working.correlation"]]
+QIC(model.q1)
+
+# remove nonsignificant
+model.q1 <- gee(CURSMOKE ~ AGE + as.factor(SEX) + as.factor(educ) 
+                 + BMI + HEARTRTE + PREVCHD  
+                 + TIMEDTH, 
+                 id = RANDID,
+                 data = my.data,
+                 family=binomial, 
+                 corstr = "exchangeable")
+knitr::kable(summary(model.q1)$coefficients[,c(1,4,5)], digits = 3)
+round(2 * pnorm(abs(coef(summary(model.q1))[,5]), lower.tail = FALSE), 3) 
 model.q1[["working.correlation"]]
 QIC(model.q1)
 
@@ -595,6 +607,7 @@ knitr::kable(summary(model.q2_1)$coefficients[,c(1,4,5)], digits = 3)
 model.q2_1[["working.correlation"]]
 QIC(model.q2_1)
 
+
 model.q2_1 <- gee(CIGPDAY ~ AGE + as.factor(SEX) + as.factor(educ) 
                  + BMI + DIABETES + HEARTRTE + PREVCHD + PREVSTRK 
                  + PREVHYP + TIMEDTH,
@@ -603,10 +616,21 @@ model.q2_1 <- gee(CIGPDAY ~ AGE + as.factor(SEX) + as.factor(educ)
                   family=poisson,
                   corstr = "exchangeable")
 knitr::kable(summary(model.q2_1)$coefficients[,c(1,4,5)], digits = 3)
-
+round(2 * pnorm(abs(coef(summary(model.q2_1))[,5]), lower.tail = FALSE), 3)
 model.q2_1[["working.correlation"]]
 QIC(model.q2_1)
 
+#remove nonsignificant at 0.1
+model.q2_1 <- gee(CIGPDAY ~ AGE + as.factor(SEX) + as.factor(educ) 
+                 + BMI + DIABETES + HEARTRTE + PREVCHD + TIMEDTH,
+                  data = my.data,
+                  id = RANDID,
+                  family=poisson,
+                  corstr = "exchangeable")
+knitr::kable(summary(model.q2_1)$coefficients[,c(1,4,5)], digits = 3)
+round(2 * pnorm(abs(coef(summary(model.q2_1))[,5]), lower.tail = FALSE), 3)
+model.q2_1[["working.correlation"]]
+QIC(model.q2_1)
 
 ##################
 # Initial Models #
@@ -714,10 +738,7 @@ knitr::kable(round(2 * pnorm(abs(coef(summary(diabp_fit2))[,5]), lower.tail = FA
 QIC(diabp_fit2)
 
 ###
-```
 
-### NEW MODELS WITH GLMER / LMER ###
-```{r}
 ### NEW MODELS WITH GLMER / LMER ###
 
 
