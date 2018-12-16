@@ -12,6 +12,8 @@ output:
     highlight: tango
     toc: yes
     toc_depth: 6
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
@@ -92,31 +94,76 @@ A conclusion specifically answering the objective of the analysis.
 *Figures*
 
 ```{r, echo = F, out.width = "50%", fig.show = "hold"}
-
+#(1)
 smoke_age_sex = data %>%
+  mutate(sex = as.factor(sex)) %>%
   select(cursmoke, age, sex) %>% 
   ggplot(aes(x = age, y = cursmoke, group = sex, color = sex)) +
   geom_jitter(height = 0.1, alpha = 0.1) +
   geom_smooth(lwd = 1.5) +
+  theme_bw() +
+  theme(legend.position="none")
+
+#(2)
+cigpday_age_sex = data %>%
+  mutate(sex = as.factor(sex)) %>%
+  select(cigpday, age, sex) %>% 
+  ggplot(aes(x = age, y = cigpday, group = sex, color = sex)) +
+  geom_jitter(height = 0.1, alpha = 0.1) +
+  geom_smooth(lwd = 1.5) +
   theme_bw() 
 
-smoke_sysbp_sex = data %>%
+#(3) systolic blood pressure
+smoke_sysbp_sex = 
+  data %>%
+  mutate(sex = as.factor(sex), cursmoke = as.factor(cursmoke)) %>%
   select(cursmoke, sysbp, sex) %>% 
-  ggplot(aes(x = sysbp, y = cursmoke, group = sex, color = sex)) +
-  geom_jitter(height = 0.1, alpha = 0.1) +
-  geom_smooth(lwd = 1.5) +
-  theme_bw() 
+  ggplot(aes(y = sysbp, x = cursmoke, color = sex)) +
+  geom_boxplot() +
+  facet_wrap(~sex) + 
+  theme_bw() +
+  theme(legend.position="none")
+ 
 
-smoke_tc_sex = data %>%
+#smoke_sysbp_sex = data %>%
+#  select(cursmoke, sysbp, sex) %>% 
+#  ggplot(aes(x = sysbp, y = cursmoke, group = sex, color = sex)) +
+#  geom_jitter(height = 0.1, alpha = 0.1) +
+#  geom_smooth(lwd = 1.5) +
+#  theme_bw() 
+
+#(4) diastolic blood pressure
+smoke_diabp_sex = 
+  data %>%
+  mutate(sex = as.factor(sex), cursmoke = as.factor(cursmoke)) %>%
+  select(cursmoke, diabp, sex) %>% 
+  ggplot(aes(y = diabp, x = cursmoke, color = sex)) +
+  geom_boxplot() +
+  facet_wrap(~sex) + 
+  theme_bw() +
+  theme(legend.position="none")
+
+#(5) total cholesterol
+smoke_totchol_sex = 
+  data %>%
+  mutate(sex = as.factor(sex), cursmoke = as.factor(cursmoke)) %>%
   select(cursmoke, totchol, sex) %>% 
-  ggplot(aes(x = totchol, y = cursmoke, group = sex, color = sex)) +
-  geom_jitter(height = 0.1, alpha = 0.1) +
-  geom_smooth(lwd = 1.5) +
-  theme_bw() 
+  ggplot(aes(y = log(totchol), x = cursmoke, color = sex)) +
+  geom_boxplot() +
+  facet_wrap(~sex) + 
+  theme_bw()
 
-smoke_age_sex
-smoke_sysbp_sex
-smoke_tc_sex
+#smoke_tc_sex = data %>%
+#  select(cursmoke, totchol, sex) %>% 
+#  ggplot(aes(x = totchol, y = cursmoke, group = sex, color = sex)) +
+#  geom_jitter(height = 0.1, alpha = 0.1) +
+#  geom_smooth(lwd = 1.5) +
+#  theme_bw() 
+
+#smoke_age_sex
+#smoke_sysbp_sex
+#smoke_tc_sex
+
 
 ## Cor plot
 
@@ -124,9 +171,13 @@ corr <- data[,c(-1,-21)] %>% cor(., use = "complete.obs")
 
 library(corrplot)
 
-corrplot(corr, type = "upper", order = "hclust",
+corr_plot = corrplot(corr, type = "upper", order = "hclust",
          tl.col = "black", tl.srt = 75, 
          tl.offset = 1, tl.cex= .8, method = "ellipse")
+
+library(gridExtra)
+grid.arrange(smoke_age_sex, cigpday_age_sex, smoke_sysbp_sex, smoke_diabp_sex, smoke_totchol_sex, 
+             layout_matrix = rbind(c(1,2, NA), c(3,4,5)), nrow = 2)
 
 ```
  
