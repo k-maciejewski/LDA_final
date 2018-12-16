@@ -1,0 +1,71 @@
+---
+title: "Untitled"
+output: pdf_document
+---
+```{r}
+library(foreign)
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+library(lme4)
+library(nlme)
+library(RLRsim)
+library(CompRandFld)
+library(MASS)
+library(gee)
+library(geepack)
+library(VIM)
+library(Amelia)
+library(reshape2)
+
+#import the data
+my.data <- read.csv("F:/courses/longitudinal/FINAL/frmgham2.csv")
+head(my.data)
+summary(my.data$AGE)
+
+as.data.frame(table(my.data$SEX))
+```
+
+(1) Is there a relationship between age and smoking status? 
+Does this relationship differ by sex?
+```{r}
+model.q1 <- glmer(CURSMOKE ~ AGE + as.factor(SEX) + AGE:as.factor(SEX) + as.factor(educ) 
+                 + BMI + DIABETES + HEARTRTE + PREVCHD + PREVSTRK 
+                 + PREVHYP + TIMEDTH + (1|RANDID),
+                 data = my.data,
+                 family=binomial,
+                 corstr = "exchangeable")
+summary(model.q1)
+exp(coef(summary(model.q1)))
+```
+We can see from the model that with age increases 1, the log odds ratio of smoking against non-smoking is -0.051.
+
+Which means that with age incraeses 1, the odds ratio of smoking against non-smoking is 1.0523. The odds of currently smoking is 5% lower than the odds of currently not smoking with the age incraeses 1 unit.
+
+We can see that both age and sex have a p-value less than 0.05. Thus, sex can differ the relationship between age and smoking status. For women, the log odds ratio of smoking against non-smoking is -0.76 as the age increases 1. Thus, for women, the odds of smoking against non-smoking is 53.2% lower with the age increases 1 unit.
+
+(2) Is there a relationship between the number of cigarettes smoked per day and age? 
+Does this relationship differ by sex?
+```{r}
+model.q2 <- lmer(CIGPDAY ~ AGE + as.factor(SEX) + as.factor(educ) + (1|RANDID),
+                  data = my.data)
+summary(model.q2)
+```
+If we think cig per day as count data, it follows poisson distribution.
+Then we can fit GEE model as well:
+```{r}
+model.q2_1 <- glmer(CIGPDAY ~ AGE + as.factor(SEX) + AGE:as.factor(SEX) + as.factor(educ) +BMI + DIABETES + HEARTRTE + PREVCHD + PREVSTRK + (1|RANDID) 
+                 + PREVHYP + TIMEDTH,
+                  data = my.data,
+                  na.action = "na.omit",
+                  family=poisson,
+                  corstr = "exchangeable")
+summary(model.q2_1)
+exp(coef(summary(model.q2_1)))
+```
+From the result we can see that the p-value of age and sex are both show significance. Thus, sex can differ the relationship between cigraettes per day.
+
+From the model that with age increases 1, the number of cigarettes per day will decrease 2.32% at a population level for men.
+
+For women, cigaretees per day will decrease 55.9% with one unit of age increases at a population level.
+
