@@ -170,15 +170,13 @@ smoke_totchol_sex =
 corr <- data[,c(-1,-21)] %>% cor(., use = "complete.obs") 
 
 library(corrplot)
-
-corr_plot = corrplot(corr, type = "upper", order = "hclust",
-         tl.col = "black", tl.srt = 75, 
-         tl.offset = 1, tl.cex= .8, method = "ellipse")
-
 library(gridExtra)
 grid.arrange(smoke_age_sex, cigpday_age_sex, smoke_sysbp_sex, smoke_diabp_sex, smoke_totchol_sex, 
              layout_matrix = rbind(c(1,2, NA), c(3,4,5)), nrow = 2)
 
+corrplot(corr, type = "upper", order = "hclust",
+         tl.col = "black", tl.srt = 75, 
+         tl.offset = 1, tl.cex= .8, method = "ellipse")
 ```
  
 *Code*
