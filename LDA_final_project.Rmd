@@ -41,18 +41,18 @@ Among subjects at first observation, age ranged from 32 to 70 years, with a mean
 
 (1) model for current smoking status: 
 
-*cursmoke ~ 5.269 - 0.053 age - 0.739 I(sex = female) + 0.072 I(educ = 2) -0.181 I(educ = 3) - 0.215 I(educ = 4) - 0.085 bmi + 0.009 heartrte - 0.290 prevchd* 
+*cursmoke ~ 5.269 - 0.053 age - 0.739 I(sex = female) + 0.072 I(educ = 2) -0.181 I(educ = 3) - 0.215 I(educ = 4) - 0.085 bmi + 0.009 heartrte - 0.290 prevchd + 0.0156 age * I(sex = female)* 
 
 (Note: education 1 = 0-11 years; 
 2 = High School Diploma; GED 3=Some College, Vocational School; 4=College (BS, BA) degree or more)
 
-From the significance of age and sex, we can find that both age and sex are significant under the significance level of 0.05, with both p-values less than 0.001. Also, for the interaction term (age:as.factor), the p-value is also significant. Thus, sex could differ this relationship, after adjusting for BMI, diabetes, heart rate, and prevalence of congenial heart disease, prevalence of stroke and time to death. The coefficient for age is –0.0594, for sex is –1.57, for interaction is 0.0156. The odds of currently smoking status is 5.8% lower than the odds of currently not smoking with the age increases 1 unit in men. Meanwhile for women, the odds ratio of smoking against non-smoking is 19.9% with the age increases 1 unit.
+From the significance of age and sex, we can find that both age and sex are significant under the significance level of 0.05, with both p-values less than 0.001. Also, for the interaction term (age:as.factor), the p-value is also significant. Thus, sex could differ this relationship, after adjusting for BMI, diabetes, heart rate, and prevalence of congenial heart disease, prevalence of stroke and time to death. The coefficient for age is –0.053, for sex is -0.739, for interaction is 0.0156. The odds of currently smoking status is 5.2% lower than the odds of currently not smoking with the age increases 1 unit in men. Meanwhile for women, the odds ratio of smoking against non-smoking is 54.0% with the age increases 1 unit.
 
 (2) model for number of cigarettes per day
 
-*cigpday ~ 4.430 - 0.022 age - 0.833 I(sex = female) + 0.097 I(educ = 2) - 0.071 I(educ = 3) - 0.065 I(educ = 4) - 0.039 bmi - 0.123 diabetes + 0.007 heartrte - 0.273 prevchd*
+*cigpday ~ 4.430 - 0.022 age - 0.833 I(sex = female) + 0.097 I(educ = 2) - 0.071 I(educ = 3) - 0.065 I(educ = 4) - 0.039 bmi - 0.123 diabetes + 0.007 heartrte - 0.273 prevchd + 0.0082 age * I(sex = female)*
 
-From the significance of age and sex, we can find that both age and sex are significant under the significance level of 0.05, with both p-values less than 0.001. Also, for the interaction term (age:as.factor), the p-value is 0.001. Thus, sex could differ cigarettes per day with age, after adjusting for BMI, diabetes, heart rate, and prevalence of congenial heart disease, prevalence of stroke and time to death. The coefficient for age is –0.0266, for sex is –1.21, for interaction is 0.0082. From the model we can see that with age increases 1 unit, the number of cigarettes per day will decrease 2.62% at a population level for men. For women, the log odds ratio of smoking against non-smoking is –1.228. Thus, cigarettes per day will decrease 70.7% with one unit of age increases at a population level for women.
+From the significance of age and sex, we can find that both age and sex are significant under the significance level of 0.05, with both p-values less than 0.001. Also, for the interaction term (age:as.factor), the p-value is 0.001. Thus, sex could differ cigarettes per day with age, after adjusting for BMI, diabetes, heart rate, and prevalence of congenial heart disease, prevalence of stroke and time to death. The coefficient for age is –0.022, for sex is –0.833, for interaction is 0.0082. From the model we can see that with age increases 1 unit, the number of cigarettes per day will decrease 2.18% at a population level for men. For women, the log odds ratio of smoking against non-smoking is -0.8468. Thus, cigarettes per day will decrease 57.1% with one unit of age increases at a population level for women.
 
 (3) systolic blood pressure
 
