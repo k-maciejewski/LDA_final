@@ -6,6 +6,7 @@ output:
     highlight: tango
 editor_options: 
   chunk_output_type: console
+geometry: margin=1in
 ---
 
 ```{r setup, include=FALSE}
@@ -23,7 +24,7 @@ attach(data)
 **OBJECTIVE:** 
 The goal of the analysis is to describe the smoking habits of the participants in the Framingham Heart study as they age. In particular, we are interested in describing the relationship between smoking status and related covariates.   
 
-**STUDY DESIGN:**  
+**STUDY DESIGN:**
 The Framingham Heart Study is a long-term prospective study of the etiology of cardiovascular disease among a population of free living subjects in the community of Framingham, Massachusetts. It was conducted to identify risk factors and their joint effect on smoking.  Data collected includes laboratory, clinic, questionnaire, and adjudicated event data. Each participant has 1 to 3 observation periods, approximately 6 years apart. There are 11,627 observations on the 4,434 participants.   
 
 **METHODS:** 
@@ -40,44 +41,39 @@ Among subjects at first observation, age ranged from 32 to 70 years, with a mean
 
 (1) model for current smoking status: 
 
-cursmoke ~ 5.269 + -0.053 age + -0.739 sex = female + 0.072 educ = 2 -0.181 educ = 3 -0.215 educ = 4 + -0.085 bmi + 0.009 heartrte + -0.290 prevchd 
+*cursmoke ~ 5.269 - 0.053 age - 0.739 I(sex = female) + 0.072 I(educ = 2) -0.181 I(educ = 3) - 0.215 I(educ = 4) - 0.085 bmi + 0.009 heartrte - 0.290 prevchd* 
 
-(note: education 1=0-11 years; 
-2=High School Diploma; GED 3=Some College, Vocational School; 4=College (BS, BA) degree or more)
+(Note: education 1 = 0-11 years; 
+2 = High School Diploma; GED 3=Some College, Vocational School; 4=College (BS, BA) degree or more)
 
-From the significance of age and sex, we can find that both age and sex are significant under the significance level of 0.05, with both p-values less than 0.001. Also, for the interaction term (age:as.factor), the p-value is also significant. Thus, sex could differ this relationship, after adjusting for BMI, diabetes, heart rate, and prevalence of congenial heart disease, prevalence of stroke and time to death. 
-
-The coefficient for age is –0.0594, for sex is –1.57, for interaction is 0.0156. The odds of currently smoking status is 5.8% lower than the odds of currently not smoking with the age increases 1 unit in men. Meanwhile for women, the log odds ratio of smoking against non-smoking is –1.6138, which means that the odds ratio of smoking against non-smoking is 19.9% with the age increases 1 unit.
+From the significance of age and sex, we can find that both age and sex are significant under the significance level of 0.05, with both p-values less than 0.001. Also, for the interaction term (age:as.factor), the p-value is also significant. Thus, sex could differ this relationship, after adjusting for BMI, diabetes, heart rate, and prevalence of congenial heart disease, prevalence of stroke and time to death. The coefficient for age is –0.0594, for sex is –1.57, for interaction is 0.0156. The odds of currently smoking status is 5.8% lower than the odds of currently not smoking with the age increases 1 unit in men. Meanwhile for women, the log odds ratio of smoking against non-smoking is –1.6138, which means that the odds ratio of smoking against non-smoking is 19.9% with the age increases 1 unit.
 
 (2) model for number of cigarettes per day
 
-cigpday ~ 4.430 + -0.022 age + -0.833 sex = female + 0.097 educ = 2 + -0.071 educ = 3 + -0.065 educ = 4 + -0.039 bmi + -0.123 diabetes + 0.007 heartrte +  -0.273 prevchd
+*cigpday ~ 4.430 - 0.022 age - 0.833 I(sex = female) + 0.097 I(educ = 2) - 0.071 I(educ = 3) - 0.065 I(educ = 4) - 0.039 bmi - 0.123 diabetes + 0.007 heartrte - 0.273 prevchd*
 
-From the significance of age and sex, we can find that both age and sex are significant under the significance level of 0.05, with both p-values less than 0.001. Also, for the interaction term (age:as.factor), the p-value is 0.001. Thus, sex could differ cigarettes per day with age, after adjusting for BMI, diabetes, heart rate, and prevalence of congenial heart disease, prevalence of stroke and time to death.
-
-The coefficient for age is –0.0266, for sex is –1.21, for interaction is 0.0082. From the model we can see that with age increases 1 unit, the number of cigarettes per day will decrease 2.62% at a population level for men. For women, the log odds ratio of smoking against non-smoking is –1.228. Thus, cigarettes per day will decrease 70.7% with one unit of age increases at a population level for women.
+From the significance of age and sex, we can find that both age and sex are significant under the significance level of 0.05, with both p-values less than 0.001. Also, for the interaction term (age:as.factor), the p-value is 0.001. Thus, sex could differ cigarettes per day with age, after adjusting for BMI, diabetes, heart rate, and prevalence of congenial heart disease, prevalence of stroke and time to death. The coefficient for age is –0.0266, for sex is –1.21, for interaction is 0.0082. From the model we can see that with age increases 1 unit, the number of cigarettes per day will decrease 2.62% at a population level for men. For women, the log odds ratio of smoking against non-smoking is –1.228. Thus, cigarettes per day will decrease 70.7% with one unit of age increases at a population level for women.
 
 (3) systolic blood pressure
 
-sysbp ~ 43.000 + -0.772 cursmoke = yes + 0.741 age + 3.321 sex = female  + 1.370 bmi + 3.173 diabetes + 0.172 heartrte + 1.553 prevchd + 4.201 prevstrk + 7.794 death
+*sysbp ~ 43.000 - 0.772 I(cursmoke = yes) + 0.741 age + 3.321 I(sex = female)  + 1.370 bmi + 3.173 diabetes + 0.172 heartrte + 1.553 prevchd + 4.201 prevstrk + 7.794 death*
 
-Our model using current smoking status after adjusting for age, sex, BMI, diabetes, heart rate, and prevalence of congenial heart disease, prevalence of stroke and death to predict systolic blood pressure had QIC of 68843.21. Current smoking status was highly significant in the model (p = 0.029). Those who did not smoke have an average systolic blood pressure over time of 40.12, and those who did smoke have an average systolic blood pressure of 3.  
+Our model using current smoking status after adjusting for age, sex, BMI, diabetes, heart rate, and prevalence of congenial heart disease, prevalence of stroke and death to predict systolic blood pressure had QIC of 68843.21. Current smoking status was highly significant in the model (p = 0.029). Those who did not smoke have an average systolic blood pressure over time of 40.12, and those who did smoke have an average systolic blood pressure of 38.99.  
 
 (4) diastolic blood pressure 
 
-diabp ~ 48.526 + -0.525 cursmoke  + -0.518 sex = female + 0.857 educ = 2 + 0.776 educ = 3 + 0.531 educ = 4  + 0.991 bmi + -2.072 diabetes + 0.106 heartrte  + 1.049 prevstrk + 3.317 death  
+*diabp ~ 48.526 - 0.525 cursmoke  - 0.518 I(sex = female) + 0.857 I(educ = 2) + 0.776 I(educ = 3) + 0.531 I(educ = 4)  + 0.991 bmi - 2.072 diabetes + 0.106 heartrte + 1.049 prevstrk + 3.317 death*  
 
 Our model using current smoking status and adjusting for education, BMI, diabetes, heart rate, and prevalence of stroke and death to predict diastolic blood pressure had QIC of 53509.72. Current smoking status was highly significant in the model (p = 0.000). Those who did not smoke have an average diastolic blood pressure over time of 47.35, and those who did smoke have an average diastolic blood pressure of 46.25. 
 
 (5) serum total cholesterol: 
 
-totchol ~ 157.548 + 3.824 cursmoke = yes + 0.402 age + 13.291 sex = female  + 1.656 bmi + -7.648 + 0.118 heartrte  + 2.423 prevhyp  
+*totchol ~ 157.548 + 3.824 I(cursmoke = yes) + 0.402 age + 13.291 I(sex = female)  + 1.656 bmi - 7.648 + 0.118 heartrte  + 2.423 prevhyp*  
 
 Our model using current smoking status and adjusting for age, sex, BMI, diabetes , heart rate, and prevalence of hypertension to predict total cholesterol had QIC of 84596.03. Current smoking status was significant in the model (p = 0.04). Those who did not smoke have an average total cholesterol over time of 162.1, and those who did smoke have an average cholesterol of 164.47.  
   
 **CONCLUSION:**
-A conclusion specifically answering the objective of the analysis.  
-  
+Age and sex are both significantly associated with number of cigarettes per day and current smoking status. Women had lower odds of being a current smoker than men, and women had on average fewer cigarettes per day. In using smoking status to predict systolic blood pressure after accounting for confounders, we found that smoking status was significant, and current smokers had on average lower systolic blood pressure. After building a model to predict diastolic blood pressure from smoking status, we found that smoking status was significantly associated with diastolic blood pressure and that current smokers have slightly lower diastolic blood pressure on average. In our model to predict serum total cholesterol, we found that smoking status was significant and current smokers had higher cholesterol on average. 
   
 \newpage
   
@@ -764,11 +760,18 @@ model.q1 <- glmer(CURSMOKE ~ AGE + as.factor(SEX) + AGE:as.factor(SEX) + as.fact
 summary(model.q1)
 exp(coef(summary(model.q1)))
 
-# We can see from the model that with age increases 1, the log odds ratio of smoking against non-smoking is -0.051.
+# We can see from the model that with age increases 1, the log odds ratio of 
+#smoking against non-smoking is -0.051.
 # 
-# Which means that with age incraeses 1, the odds ratio of smoking against non-smoking is 1.0523. The odds of currently smoking is 5% lower than the odds of currently not smoking with the age incraeses 1 unit.
+# Which means that with age incraeses 1, the odds ratio of smoking against 
+#non-smoking is 1.0523. The odds of currently smoking is 5% lower than the odds 
+#of currently not smoking with the age incraeses 1 unit.
 # 
-# We can see that both age and sex have a p-value less than 0.05. Thus, sex can differ the relationship between age and smoking status. For women, the log odds ratio of smoking against non-smoking is -0.76 as the age increases 1. Thus, for women, the odds of smoking against non-smoking is 53.2% lower with the age increases 1 unit.
+# We can see that both age and sex have a p-value less than 0.05. Thus, sex can 
+# differ the relationship between age and smoking status. For women, the log 
+#odds # ratio of smoking against non-smoking is -0.76 as the age increases 1. 
+#Thus, for # women, the odds of smoking against non-smoking is 53.2% lower with the age 
+# increases 1 unit.
 
 # (2) Is there a relationship between the number of cigarettes smoked per day and age? 
 # Does this relationship differ by sex?
@@ -791,7 +794,9 @@ exp(coef(summary(model.q2_1)))
 
 # prevhyp not sig
 
-model.q2_1 <- glmer(CIGPDAY ~ AGE + as.factor(SEX) + AGE:as.factor(SEX) + as.factor(educ) + BMI + DIABETES + HEARTRTE + PREVCHD + PREVSTRK + (1|RANDID) 
+model.q2_1 <- glmer(CIGPDAY ~ AGE + as.factor(SEX) + AGE:as.factor(SEX) +
+                      as.factor(educ) + BMI + DIABETES + HEARTRTE + PREVCHD +
+                      PREVSTRK + (1|RANDID) 
                   + TIMEDTH,
                   data = my.data,
                   na.action = "na.omit",
@@ -800,15 +805,20 @@ model.q2_1 <- glmer(CIGPDAY ~ AGE + as.factor(SEX) + AGE:as.factor(SEX) + as.fac
 summary(model.q2_1)
 exp(coef(summary(model.q2_1)))
 
-# From the result we can see that the p-value of age and sex are both show significance. Thus, sex can differ the relationship between cigraettes per day.
+# From the result we can see that the p-value of age and sex are both show
+# significance. Thus, sex can differ the relationship between cigraettes per day.
 # 
-# From the model that with age increases 1, the number of cigarettes per day will decrease 2.32% at a population level for men.
+# From the model that with age increases 1, the number of cigarettes per day 
+# will decrease 2.32% at a population level for men.
 # 
-# For women, cigaretees per day will decrease 55.9% with one unit of age increases at a population level.
+# For women, cigaretees per day will decrease 55.9% with one unit of age 
+# increases at a population level.
 
 ## (3) Totchol and cursmoke
 
-totchol_fit <- glmer(TOTCHOL ~ AGE + as.factor(SEX) + AGE:as.factor(SEX) + as.factor(educ) + BMI + DIABETES + HEARTRTE + PREVCHD + PREVSTRK + (1|RANDID) 
+totchol_fit <- glmer(TOTCHOL ~ AGE + as.factor(SEX) + AGE:as.factor(SEX) +
+                       as.factor(educ) + BMI + DIABETES + HEARTRTE + PREVCHD +
+                       PREVSTRK + (1|RANDID) 
                  + PREVHYP + TIMEDTH,
                   data = my.data,
                   na.action = "na.omit",
@@ -818,8 +828,9 @@ summary(totchol_fit)
 
 #prevstrk not sig
 
-totchol_fit <- glmer(TOTCHOL ~ AGE + as.factor(SEX) + AGE:as.factor(SEX) + as.factor(educ) + BMI + DIABETES + HEARTRTE + PREVCHD + (1|RANDID) 
-                 + PREVHYP + TIMEDTH,
+totchol_fit <- glmer(TOTCHOL ~ AGE + as.factor(SEX) + AGE:as.factor(SEX) +
+                       as.factor(educ) + BMI + DIABETES + HEARTRTE + PREVCHD +
+                       (1|RANDID) + PREVHYP + TIMEDTH,
                   data = my.data,
                   na.action = "na.omit",
                   family="poisson",
@@ -831,7 +842,8 @@ summary(totchol_fit)
 
 # treat as gaussian??
 
-sysbp_fit <- lmer(SYSBP ~ AGE + as.factor(SEX) + as.factor(educ) + BMI + DIABETES + HEARTRTE + PREVCHD + PREVSTRK + (1|RANDID) 
+sysbp_fit <- lmer(SYSBP ~ AGE + as.factor(SEX) + as.factor(educ) + BMI +
+                    DIABETES + HEARTRTE + PREVCHD + PREVSTRK + (1|RANDID) 
                  + PREVHYP + TIMEDTH,
                   data = my.data,
                   na.action = "na.omit",
@@ -844,7 +856,8 @@ summary(sysbp_fit)
 
 # doesnt converge as GLMER
 
-diabp_fit <- glmer(DIABP ~ AGE + as.factor(SEX) + as.factor(educ) + BMI + DIABETES + HEARTRTE + PREVCHD + PREVSTRK + (1|RANDID) 
+diabp_fit <- glmer(DIABP ~ AGE + as.factor(SEX) + as.factor(educ) + BMI +
+                     DIABETES + HEARTRTE + PREVCHD + PREVSTRK + (1|RANDID) 
                  + PREVHYP + TIMEDTH,
                   data = my.data,
                   na.action = "na.omit",
