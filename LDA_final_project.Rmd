@@ -48,7 +48,7 @@ Among subjects at first observation, age ranged from 32 to 70 years, with a mean
 
 We find that both age and sex are significant under the significance level of 0.05, with both p-values less than 0.001. The p value for interaction term (age:as.factor) is also significant. Thus, sex could effect this relationship, after adjusting for BMI, heart rate, and prevalence of congenial heart disease. The coefficient for age is –0.064, for sex is –1.827, for interaction is 0.020. The odds of currently smoking status is 6.2% lower than the odds of currently not smoking with 1 year increase in age for men. 
 
-**Meanwhile for women, the odds ratio of smoking against non-smoking is 19.9% with 1 year increase in age.**
+**Meanwhile for women, the odds ratio of smoking against non-smoking is e^(-0.064-1.827+0.20)=18.4% with 1 year increase in age.**
 
 (2) model for number of cigarettes per day
 
@@ -56,7 +56,7 @@ We find that both age and sex are significant under the significance level of 0.
 
 We find that age and sex, and the interaction are significant under the significance level of 0.05, with both p-values less than 0.001.  Thus, sex could differ cigarettes per day with age, after adjusting for BMI, diabetes, heart rate, and prevalence of congenial heart disease, prevalence of stroke and time to death. The coefficient for age is –0.027, for sex is –1.520, for interaction is 0.014. From the model we can see that with age increases 1 year, the number of cigarettes per day will decrease 2.67% at a population level for men. 
 
-**For women, the log odds ratio of smoking against non-smoking is –1.228. Thus, cigarettes per day will decrease 70.7% with 1 year increase in age at a population level for women.**
+**For women, the log odds ratio of smoking against non-smoking is -0.027-1.52+0.014=-1.533. Thus, the relative mean number of cigarettes per day is 0.216 (21.6%) with 1 year increase in age at a population level for women, adjusted for education, bmi, diabetes, heartrate and prevchd.**
 
 (3) systolic blood pressure
 
