@@ -34,41 +34,45 @@ Exploratory analysis included using graphs to investigate the relationship of co
 
 The variables selected for consideration in model building were outcomes of interest: smoking status, cigarettes per day, systolic blood pressure, diastolic blood pressure, and serum total cholesterol; age and sex, due to interactions seen in exploratory analysis; and possible confounders BMI, diabetes, heart rate, prevalent coronary heart disease, prevalent stroke, death. 
 
-In formal analysis we used longitudinal generalized estimating equations (GEEs) models. Although we dealt with incomplete and unequally spaced data, we decided in favor of marginal modeling approach after experiencing multiple convergence issues during model building exercise under MCAR assumption. However, we realize and discussed within the group that missing data could be a result of MAR or NMAR mechanisms and then conditional likelihood-based model or marginal model after imputation could be more appropriate choices. To determine which covariates we should adjust for in our full models, we took into account overall significance of confounders for the effect of smoking status and our three variables of interest. We also used QIC to compare models with unstructured and exchangeable correlation structures. 
+In formal analysis we used longitudinal generalized estimating equations (GEEs) models. Although we dealt with incomplete and unequally spaced data, we decided in favor of marginal modeling approach after experiencing multiple convergence issues during model building exercise under MCAR assumption. However, we realize and discussed within the group that missing data could be a result of MAR or NMAR mechanisms and then conditional likelihood-based model or marginal model after imputation could be more appropriate choices. To determine which covariates we should adjust for in our full models, we took into account overall significance of confounders for the effect of smoking status and our three variables of interest. We used a cut-off of p = 0.10 for inclusion into final model. We also used QIC to compare models with unstructured and exchangeable correlation structures. The QIC values were very similar for both structures so we use exchangeable for interpretability and parsimony.
   
 **RESULTS:**
 Among subjects at first observation, age ranged from 32 to 70 years, with a mean of 49.93 years. Of the 4,434 participants, 1,944 were male and 2,490 were female. 2,181 were current smokers and 2,253 were not. Total cholesterol for all subjects ranged from 107 to 696, with a mean of 237. Diastolic blood pressure ranged from 48 to 142.5, with a mean of 83.08. Systolic blood pressure ranged from 83.5 to 295, with a mean of 132.9. Cigarettes smoked per day ranged from 0 to 70, with a mean of 8.97 for all subjects. For smokers, cigarettes smoked per day ranged from 1 to 70, with a mean of 18.37.   
 
 (1) model for current smoking status: 
 
-*cursmoke ~ 5.269 - 0.053 age - 0.739 I(sex = female) + 0.072 I(educ = 2) -0.181 I(educ = 3) - 0.215 I(educ = 4) - 0.085 bmi + 0.009 heartrte - 0.290 prevchd + 0.0156 age * I(sex = female)* 
+*cursmoke = 5.947 - 0.064 age -1.827 I(sex = female) + 0.020 age x I(sex = female) + 0.063 I(educ = 2) -0.183 I(educ = 3) - 0.229 I(educ = 4) - 0.087 bmi + 0.009 heartrte - 0.265 prevchd* 
 
 (Note: education 1 = 0-11 years; 
 2 = High School Diploma; GED 3=Some College, Vocational School; 4=College (BS, BA) degree or more)
 
-From the significance of age and sex, we can find that both age and sex are significant under the significance level of 0.05, with both p-values less than 0.001. Also, for the interaction term (age:as.factor), the p-value is also significant. Thus, sex could differ this relationship, after adjusting for BMI, diabetes, heart rate, and prevalence of congenial heart disease, prevalence of stroke and time to death. The coefficient for age is –0.053, for sex is -0.739, for interaction is 0.0156. The odds of currently smoking status is 5.2% lower than the odds of currently not smoking with the age increases 1 unit in men. Meanwhile for women, the odds ratio of smoking against non-smoking is 54.0% with the age increases 1 unit.
+We find that both age and sex are significant under the significance level of 0.05, with both p-values less than 0.001. The p value for interaction term (age:as.factor) is also significant. Thus, sex could effect this relationship, after adjusting for BMI, heart rate, and prevalence of congenial heart disease. The coefficient for age is –0.064, for sex is –1.827, for interaction is 0.020. The odds of currently smoking status is 6.2% lower than the odds of currently not smoking with 1 year increase in age for men. 
+
+**Meanwhile for women, the odds ratio of smoking against non-smoking is 19.9% with 1 year increase in age.**
 
 (2) model for number of cigarettes per day
 
-*cigpday ~ 4.430 - 0.022 age - 0.833 I(sex = female) + 0.097 I(educ = 2) - 0.071 I(educ = 3) - 0.065 I(educ = 4) - 0.039 bmi - 0.123 diabetes + 0.007 heartrte - 0.273 prevchd + 0.0082 age * I(sex = female)*
+*cigpday = 4.751 - 0.027 age - 1.520 I(sex = female) + 0.014 age x I(sex = female) + 0.087 I(educ = 2) - 0.074 I(educ = 3) - 0.069 I(educ = 4) - 0.041 bmi - 0.125 diabetes + 0.007 heartrte - 0.255 prevchd*
 
-From the significance of age and sex, we can find that both age and sex are significant under the significance level of 0.05, with both p-values less than 0.001. Also, for the interaction term (age:as.factor), the p-value is 0.001. Thus, sex could differ cigarettes per day with age, after adjusting for BMI, diabetes, heart rate, and prevalence of congenial heart disease, prevalence of stroke and time to death. The coefficient for age is –0.022, for sex is –0.833, for interaction is 0.0082. From the model we can see that with age increases 1 unit, the number of cigarettes per day will decrease 2.18% at a population level for men. For women, the log odds ratio of smoking against non-smoking is -0.8468. Thus, cigarettes per day will decrease 57.1% with one unit of age increases at a population level for women.
+We find that age and sex, and the interaction are significant under the significance level of 0.05, with both p-values less than 0.001.  Thus, sex could differ cigarettes per day with age, after adjusting for BMI, diabetes, heart rate, and prevalence of congenial heart disease, prevalence of stroke and time to death. The coefficient for age is –0.027, for sex is –1.520, for interaction is 0.014. From the model we can see that with age increases 1 year, the number of cigarettes per day will decrease 2.67% at a population level for men. 
+
+**For women, the log odds ratio of smoking against non-smoking is –1.228. Thus, cigarettes per day will decrease 70.7% with 1 year increase in age at a population level for women.**
 
 (3) systolic blood pressure
 
-*sysbp ~ 43.000 - 0.772 I(cursmoke = yes) + 0.741 age + 3.321 I(sex = female)  + 1.370 bmi + 3.173 diabetes + 0.172 heartrte + 1.553 prevchd + 4.201 prevstrk + 7.794 death*
+*sysbp = 43.000 - 0.772 I(cursmoke = yes) + 0.741 age + 3.321 I(sex = female)  + 1.370 bmi + 3.173 diabetes + 0.172 heartrte + 1.553 prevchd + 4.201 prevstrk + 7.794 death*
 
 The above model using exchangeable correlation structure had QIC of 68837.55. Current smoking status was not significant in the model at the 0.05 significance level (p = 0.074), indicating current smoking status is not significantly associated with systolic blood pressure after adjusting for covariates. Those who did not smoke have an average systolic blood pressure over time of 43, and current smokers have an average systolic blood pressure of 42.228.  
 
 (4) diastolic blood pressure 
 
-*diabp ~ 48.526 - 0.525 cursmoke  - 0.518 I(sex = female) + 0.857 I(educ = 2) + 0.776 I(educ = 3) + 0.531 I(educ = 4)  + 0.991 bmi - 2.072 diabetes + 0.106 heartrte + 1.049 prevstrk + 3.317 death*  
+*diabp = 48.526 - 0.525 cursmoke  - 0.518 I(sex = female) + 0.857 I(educ = 2) + 0.776 I(educ = 3) + 0.531 I(educ = 4)  + 0.991 bmi - 2.072 diabetes + 0.106 heartrte + 1.049 prevstrk + 3.317 death*  
 
 Our model with exchangeable correlation structure using current smoking status and adjusting for covariates to predict diastolic blood pressure had QIC of 53508. Current smoking status was significant in the model (p = 0.03). Those who did not smoke have an average diastolic blood pressure over time of 48.526, and those who did smoke have an average diastolic blood pressure of 48.001. 
 
 (5) serum total cholesterol: 
 
-*totchol ~ 157.548 + 3.824 I(cursmoke = yes) + 0.402 age + 13.291 I(sex = female)  + 1.656 bmi - 7.648 + 0.118 heartrte  + 2.423 prevhyp*  
+*totchol = 157.548 + 3.824 I(cursmoke = yes) + 0.402 age + 13.291 I(sex = female)  + 1.656 bmi - 7.648 + 0.118 heartrte  + 2.423 prevhyp*  
 
 Our model using current smoking status and adjusting covariates with exchangeable correlation structure to predict total cholesterol had QIC of 84588.27. Current smoking status was highly significant in the model (p = 0). Those who did not smoke have an average total cholesterol over time of 157.548, and current smokers have an average cholesterol of 161.372.  
   
@@ -549,7 +553,7 @@ car::vif(model)
 my.data <- read.csv("../final_data/frmgham2.csv")
 library(gee)
 
-model.q1 <- gee(CURSMOKE ~ AGE + as.factor(SEX) + as.factor(educ) 
+model.q1 <- gee(CURSMOKE ~ AGE + as.factor(SEX) + AGE:as.factor(SEX) + as.factor(educ) 
                  + BMI + DIABETES + HEARTRTE + PREVCHD + PREVSTRK 
                  + PREVHYP + TIMEDTH, 
                  id = RANDID,
@@ -560,7 +564,7 @@ knitr::kable(summary(model.q1)$coefficients[,c(1,4,5)], digits = 3)
 model.q1[["working.correlation"]]
 QIC(model.q1)
 
-model.q1 <- gee(CURSMOKE ~ AGE + as.factor(SEX) + as.factor(educ) 
+model.q1 <- gee(CURSMOKE ~ AGE + as.factor(SEX) + AGE:as.factor(SEX) + as.factor(educ) 
                  + BMI + DIABETES + HEARTRTE + PREVCHD + PREVSTRK 
                  + PREVHYP + TIMEDTH, 
                  id = RANDID,
@@ -573,7 +577,7 @@ model.q1[["working.correlation"]]
 QIC(model.q1)
 
 # remove nonsignificant
-model.q1 <- gee(CURSMOKE ~ AGE + as.factor(SEX) + as.factor(educ) 
+model.q1 <- gee(CURSMOKE ~ AGE + as.factor(SEX) + AGE:as.factor(SEX) + as.factor(educ) 
                  + BMI + HEARTRTE + PREVCHD  
                  + TIMEDTH, 
                  id = RANDID,
@@ -591,7 +595,7 @@ QIC(model.q1)
 # If we think cig per day as count data, it follows poisson distribution.
 # Then we can fit GEE model as well:
 
-model.q2_1 <- gee(CIGPDAY ~ AGE + as.factor(SEX) + as.factor(educ) 
+model.q2_1 <- gee(CIGPDAY ~ AGE + as.factor(SEX) + AGE:as.factor(SEX) + as.factor(educ) 
                  + BMI + DIABETES + HEARTRTE + PREVCHD + PREVSTRK 
                  + PREVHYP + TIMEDTH,
                   data = my.data,
@@ -604,7 +608,7 @@ model.q2_1[["working.correlation"]]
 QIC(model.q2_1)
 
 
-model.q2_1 <- gee(CIGPDAY ~ AGE + as.factor(SEX) + as.factor(educ) 
+model.q2_1 <- gee(CIGPDAY ~ AGE + as.factor(SEX) + AGE:as.factor(SEX) + as.factor(educ) 
                  + BMI + DIABETES + HEARTRTE + PREVCHD + PREVSTRK 
                  + PREVHYP + TIMEDTH,
                   data = my.data,
@@ -617,14 +621,13 @@ model.q2_1[["working.correlation"]]
 QIC(model.q2_1)
 
 #remove nonsignificant at 0.1
-model.q2_1 <- gee(CIGPDAY ~ AGE + as.factor(SEX) + as.factor(educ) 
+model.q2_1 <- gee(CIGPDAY ~ AGE + as.factor(SEX) + AGE:as.factor(SEX) + as.factor(educ) 
                  + BMI + DIABETES + HEARTRTE + PREVCHD + TIMEDTH,
                   data = my.data,
                   id = RANDID,
                   family=poisson,
                   corstr = "exchangeable")
-knitr::kable(summary(model.q2_1)$coefficients[,c(1,4,5)], digits = 3)
-round(2 * pnorm(abs(coef(summary(model.q2_1))[,5]), lower.tail = FALSE), 3)
+knitr::kable(summary(model.q2_1)$coefficients[,c(1,4,5)], digits = 3)round(2 * pnorm(abs(coef(summary(model.q2_1))[,5]), lower.tail = FALSE), 3)
 model.q2_1[["working.correlation"]]
 QIC(model.q2_1)
 
