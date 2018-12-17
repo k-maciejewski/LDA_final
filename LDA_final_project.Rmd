@@ -46,7 +46,7 @@ Among subjects at first observation, age ranged from 32 to 70 years, with a mean
 (Note: education 1 = 0-11 years; 
 2 = High School Diploma; GED 3=Some College, Vocational School; 4=College (BS, BA) degree or more)
 
-From the significance of age and sex, we can find that both age and sex are significant under the significance level of 0.05, with both p-values less than 0.001. Also, for the interaction term (age:as.factor), the p-value is also significant. Thus, sex could differ this relationship, after adjusting for BMI, diabetes, heart rate, and prevalence of congenial heart disease, prevalence of stroke and time to death. The coefficient for age is –0.0594, for sex is –1.57, for interaction is 0.0156. The odds of currently smoking status is 5.8% lower than the odds of currently not smoking with the age increases 1 unit in men. Meanwhile for women, the log odds ratio of smoking against non-smoking is –1.6138, which means that the odds ratio of smoking against non-smoking is 19.9% with the age increases 1 unit.
+From the significance of age and sex, we can find that both age and sex are significant under the significance level of 0.05, with both p-values less than 0.001. Also, for the interaction term (age:as.factor), the p-value is also significant. Thus, sex could differ this relationship, after adjusting for BMI, diabetes, heart rate, and prevalence of congenial heart disease, prevalence of stroke and time to death. The coefficient for age is –0.0594, for sex is –1.57, for interaction is 0.0156. The odds of currently smoking status is 5.8% lower than the odds of currently not smoking with the age increases 1 unit in men. Meanwhile for women, the odds ratio of smoking against non-smoking is 19.9% with the age increases 1 unit.
 
 (2) model for number of cigarettes per day
 
@@ -58,22 +58,22 @@ From the significance of age and sex, we can find that both age and sex are sign
 
 *sysbp ~ 43.000 - 0.772 I(cursmoke = yes) + 0.741 age + 3.321 I(sex = female)  + 1.370 bmi + 3.173 diabetes + 0.172 heartrte + 1.553 prevchd + 4.201 prevstrk + 7.794 death*
 
-Our model using current smoking status after adjusting for age, sex, BMI, diabetes, heart rate, and prevalence of congenial heart disease, prevalence of stroke and death to predict systolic blood pressure had QIC of 68843.21. Current smoking status was highly significant in the model (p = 0.029). Those who did not smoke have an average systolic blood pressure over time of 40.12, and those who did smoke have an average systolic blood pressure of 38.99.  
+The above model using exchangeable correlation structure had QIC of 68837.55. Current smoking status was not significant in the model at the 0.05 significance level (p = 0.074), indicating current smoking status is not significantly associated with systolic blood pressure after adjusting for covariates. Those who did not smoke have an average systolic blood pressure over time of 43, and current smokers have an average systolic blood pressure of 42.228.  
 
 (4) diastolic blood pressure 
 
 *diabp ~ 48.526 - 0.525 cursmoke  - 0.518 I(sex = female) + 0.857 I(educ = 2) + 0.776 I(educ = 3) + 0.531 I(educ = 4)  + 0.991 bmi - 2.072 diabetes + 0.106 heartrte + 1.049 prevstrk + 3.317 death*  
 
-Our model using current smoking status and adjusting for education, BMI, diabetes, heart rate, and prevalence of stroke and death to predict diastolic blood pressure had QIC of 53509.72. Current smoking status was highly significant in the model (p = 0.000). Those who did not smoke have an average diastolic blood pressure over time of 47.35, and those who did smoke have an average diastolic blood pressure of 46.25. 
+Our model with exchangeable correlation structure using current smoking status and adjusting for covariates to predict diastolic blood pressure had QIC of 53508. Current smoking status was significant in the model (p = 0.03). Those who did not smoke have an average diastolic blood pressure over time of 48.526, and those who did smoke have an average diastolic blood pressure of 48.001. 
 
 (5) serum total cholesterol: 
 
 *totchol ~ 157.548 + 3.824 I(cursmoke = yes) + 0.402 age + 13.291 I(sex = female)  + 1.656 bmi - 7.648 + 0.118 heartrte  + 2.423 prevhyp*  
 
-Our model using current smoking status and adjusting for age, sex, BMI, diabetes , heart rate, and prevalence of hypertension to predict total cholesterol had QIC of 84596.03. Current smoking status was significant in the model (p = 0.04). Those who did not smoke have an average total cholesterol over time of 162.1, and those who did smoke have an average cholesterol of 164.47.  
+Our model using current smoking status and adjusting covariates with exchangeable correlation structure to predict total cholesterol had QIC of 84588.27. Current smoking status was highly significant in the model (p = 0). Those who did not smoke have an average total cholesterol over time of 157.548, and current smokers have an average cholesterol of 161.372.  
   
 **CONCLUSION:**
-Age and sex are both significantly associated with number of cigarettes per day and current smoking status. Women had lower odds of being a current smoker than men, and women had on average fewer cigarettes per day. In using smoking status to predict systolic blood pressure after accounting for confounders, we found that smoking status was significant, and current smokers had on average lower systolic blood pressure. After building a model to predict diastolic blood pressure from smoking status, we found that smoking status was significantly associated with diastolic blood pressure and that current smokers have slightly lower diastolic blood pressure on average. In our model to predict serum total cholesterol, we found that smoking status was significant and current smokers had higher cholesterol on average. 
+Age and sex are both significantly associated with number of cigarettes per day and current smoking status. Overall, it appears that number of cigarettes per day decreases with age, and the odds of being a current smoker decreases with age. Sex does differ the relationship between age and cigarettes per day as well as age and current smoking status. Women had lower odds of being a current smoker than men, and women had on average fewer cigarettes per day. In using smoking status to predict systolic blood pressure after accounting for confounders, we found that smoking status was significant, and current smokers had on average lower systolic blood pressure. After building a model to predict diastolic blood pressure from smoking status, we found that smoking status was not significantly associated with diastolic blood pressure. In our model to predict serum total cholesterol, we found that smoking status was significant and current smokers had higher cholesterol on average. 
   
 \newpage
   
